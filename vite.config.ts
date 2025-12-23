@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
     // Загружаем переменные из всех .env файлов
-    const env = loadEnv(mode, process.cwd(), '');
+    const env = loadEnv(mode, '.', '');
     
     // Собираем ключ из всех возможных источников
     const apiKey = env.VITE_API_KEY || env.GEMINI_API_KEY || env.API_KEY || process.env.API_KEY || '';

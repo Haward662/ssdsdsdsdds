@@ -2,8 +2,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 import { GoogleGenAI } from "@google/genai";
-import { SERVICES, REVIEWS, NAV_LINKS } from './constants.tsx';
-import { Service, ReviewStory } from './types.ts';
+import { SERVICES, REVIEWS, NAV_LINKS, CASES } from './constants.tsx';
+import { Service, ReviewStory, CaseStudy } from './types.ts';
 
 const LOGO_URL = "https://i.ibb.co/0pzdjPSh/Chat-GPT-Image-22-2025-12-19-19.png";
 
@@ -107,7 +107,7 @@ const CustomCursor = () => {
   return <motion.div style={{ x: cursorX, y: cursorY }} className="fixed top-0 left-0 w-8 h-8 border border-indigo-500 rounded-full pointer-events-none z-[9999] mix-blend-difference hidden md:block" />;
 };
 
-const Magnetic = ({ children, strength = 0.35 }: { children: React.ReactNode, strength?: number }) => {
+const Magnetic = ({ children, strength = 0.35 }: { children?: React.ReactNode, strength?: number }) => {
   const ref = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0); const y = useMotionValue(0);
   const sx = useSpring(x); const sy = useSpring(y);
@@ -206,6 +206,118 @@ const Hero = ({ onOpenQuiz }: { onOpenQuiz: () => void }) => {
           </div>
         </div>
       </motion.div>
+    </section>
+  );
+};
+
+// --- Cases Section (NEW) ---
+const CasesSection = () => {
+  const [filter, setFilter] = useState('Все');
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const categories = ['Все', 'Комплексный маркетинг', 'SMM', 'Разработка сайта', 'Карты и агрегаторы', 'CRM и аналитика'];
+
+  const filteredCases = filter === 'Все' 
+    ? CASES 
+    : CASES.filter(c => c.tags.includes(filter));
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const { scrollLeft, clientWidth } = scrollRef.current;
+      const scrollAmount = clientWidth * 0.5;
+      scrollRef.current.scrollTo({
+        left: direction === 'left' ? scrollLeft - scrollAmount : scrollLeft + scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  return (
+    <section id="cases" className="relative py-24 md:py-32 px-6 md:px-8 bg-black border-t border-white/5">
+      <div className="max-w-[1600px] mx-auto">
+        <div className="mb-12 md:mb-16">
+          <h2 className="text-5xl md:text-8xl font-black text-indigo-500 mb-8 md:mb-12 tracking-tighter">Кейсы</h2>
+          
+          {/* Filters */}
+          <div className="flex flex-wrap gap-3 md:gap-4 mb-8">
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setFilter(cat)}
+                className={`px-5 py-2.5 rounded-full text-xs md:text-sm font-medium transition-all border ${
+                  filter === cat 
+                    ? 'bg-indigo-600 border-indigo-600 text-white' 
+                    : 'bg-transparent border-white/10 text-white/60 hover:border-white/30 hover:text-white'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Navigation Arrows */}
+          <div className="flex gap-4">
+             <button onClick={() => scroll('left')} className="p-3 hover:text-indigo-500 transition-colors text-white/50"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M19 12H5M5 12L12 19M5 12L12 5"/></svg></button>
+             <button onClick={() => scroll('right')} className="p-3 hover:text-indigo-500 transition-colors text-white/50"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M5 12H19M19 12L12 5M19 12L12 19"/></svg></button>
+          </div>
+        </div>
+
+        {/* Carousel */}
+        <div ref={scrollRef} className="flex gap-6 overflow-x-auto no-scrollbar pb-10 snap-x">
+          <AnimatePresence mode="popLayout">
+            {filteredCases.map((c) => (
+              <motion.div
+                key={c.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="flex-shrink-0 w-full md:w-[600px] bg-[#0a0a0a] border border-white/10 rounded-[2rem] p-8 md:p-10 flex flex-col justify-between group hover:border-indigo-500/30 transition-colors snap-start"
+              >
+                {/* Header: Logo & Company Info */}
+                <div className="flex items-start justify-between mb-8 md:mb-12">
+                   <div className="flex flex-col gap-1">
+                      <h3 className="text-3xl md:text-4xl font-black text-white uppercase tracking-tight">{c.companyName}</h3>
+                      <p className="text-[10px] md:text-xs text-white/40 uppercase tracking-widest max-w-[200px]">{c.companyDescription}</p>
+                   </div>
+                   <div className="hidden md:block w-px h-12 bg-white/10 mx-4" />
+                   <div className="hidden md:block text-[10px] text-white/30 uppercase tracking-widest max-w-[150px] text-right">
+                     {c.tags.join(' • ')}
+                   </div>
+                </div>
+
+                {/* Body: Title & Tasks */}
+                <div className="mb-8 md:mb-12">
+                   <h4 className="text-xl md:text-2xl font-light text-white uppercase mb-6 leading-tight">
+                     {c.title} <span className="text-indigo-500 font-bold">{c.highlight}</span>
+                   </h4>
+                   <ul className="space-y-3">
+                     {c.tasks.map((task, i) => (
+                       <li key={i} className="flex items-start gap-3 text-sm text-white/60 font-light">
+                          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/30 flex-shrink-0" />
+                          {task}
+                       </li>
+                     ))}
+                   </ul>
+                </div>
+
+                {/* Footer: Metrics */}
+                <div className="bg-white/[0.03] rounded-2xl p-6 border border-white/5">
+                  <p className="text-[10px] text-white/30 uppercase tracking-widest mb-4">Выход на показатели:</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    {c.metrics.map((m, i) => (
+                      <div key={i}>
+                        <p className="text-2xl md:text-3xl font-medium text-indigo-400 mb-1">{m.value}</p>
+                        <p className="text-[10px] text-white/40 uppercase tracking-wider">{m.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      </div>
     </section>
   );
 };
@@ -313,6 +425,62 @@ const SmartFunnel = () => {
   );
 };
 
+// --- Strategy Video Section ---
+const StrategyVideoSection = () => {
+  return (
+    <section className="py-24 md:py-40 px-6 md:px-8 bg-neutral-900 border-y border-white/5 relative overflow-hidden">
+      {/* Background accents similar to other sections */}
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-indigo-600/10 blur-[150px] rounded-full pointer-events-none" />
+
+      <div className="max-w-[1400px] mx-auto">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+          {/* Text Content */}
+          <div className="space-y-8 md:space-y-10 order-2 lg:order-1">
+            <h2 className="text-4xl md:text-6xl font-black text-white italic uppercase leading-[0.9] tracking-tighter">
+              КАКАЯ ДОЛЖНА БЫТЬ <span className="text-indigo-500">МАРКЕТИНГ СТРАТЕГИЯ</span> И ВОРОНКА ПРОДАЖ?
+            </h2>
+            <div className="space-y-6 pl-4 border-l-2 border-indigo-500/30">
+               <p className="text-sm md:text-base text-white/60 font-bold italic uppercase tracking-widest">
+                 ДЛЯ ДОСТАВОК ЕДЫ И РЕСТОРАНОВ
+               </p>
+               <p className="text-lg md:text-xl text-white/80 leading-relaxed font-medium">
+                 В видео я расскажу: Про воронку продаж, как зацепить клиента, как достучаться до сложной аудитории и превратить их в постоянных гостей.
+               </p>
+            </div>
+            <div className="pt-4">
+              <a href="https://vk.com/proboostsmm" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 text-white/50 hover:text-indigo-400 transition-colors uppercase text-xs font-black tracking-widest">
+                <span>Смотреть больше в VK</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          {/* Video Embed */}
+          <div className="relative order-1 lg:order-2">
+            <div className="glass-card p-2 md:p-4 rounded-[2rem] border border-white/10 shadow-2xl relative z-10">
+              <div className="relative aspect-video rounded-[1.5rem] overflow-hidden bg-black border border-white/5">
+                <iframe
+                  src="https://vk.com/video_ext.php?oid=-210647270&id=456239025&hd=2"
+                  width="100%"
+                  height="100%"
+                  allow="autoplay; encrypted-media; fullscreen; picture-in-picture;"
+                  frameBorder="0"
+                  allowFullScreen
+                  className="w-full h-full"
+                  title="Marketing Strategy Video"
+                ></iframe>
+              </div>
+            </div>
+            {/* Decorative elements */}
+             <div className="absolute -top-10 -right-10 w-40 h-40 bg-indigo-500/20 blur-[80px] -z-10" />
+             <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-pink-500/10 blur-[80px] -z-10" />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 // --- Services Section ---
 const ServicesSection = () => (
   <section id="services" className="relative py-20 md:py-32 px-6 md:px-8 bg-neutral-950">
@@ -326,7 +494,11 @@ const ServicesSection = () => (
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-1">
         {SERVICES.map((s, i) => (
           <div key={s.id} className="group p-6 md:p-10 bg-white/5 border border-white/5 hover:bg-indigo-600/10 hover:border-indigo-500/20 transition-all duration-300 flex flex-col min-h-[220px] md:min-h-[280px] relative overflow-hidden">
-            <div className="text-3xl md:text-5xl mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-300 origin-left">{s.icon}</div>
+            <div className="flex gap-2 mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-300 origin-left">
+              {s.icons.map((icon, idx) => (
+                <img key={idx} src={icon} alt="" className="h-8 md:h-12 w-auto object-contain" />
+              ))}
+            </div>
             <h3 className="text-lg md:text-xl lg:text-2xl font-black text-white uppercase mb-2 md:mb-4 tracking-tighter leading-tight">{s.title}</h3>
             <p className="text-white/40 leading-snug mb-4 md:mb-6 flex-grow text-xs md:text-sm lg:text-base pr-4">{s.description}</p>
             <div className="absolute right-4 bottom-4 text-white/[0.03] text-5xl md:text-7xl font-black italic select-none">{i+1}</div>
@@ -477,8 +649,10 @@ const App = () => {
           <Navbar onOpenQuiz={() => setIsQuiz(true)} />
           <main>
             <Hero onOpenQuiz={() => setIsQuiz(true)} />
+            <CasesSection />
             <ServicesSection />
             <SmartFunnel />
+            <StrategyVideoSection />
             <StoriesSection />
             <ContactSection />
           </main>

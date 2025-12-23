@@ -1,9 +1,9 @@
 
-import { Service, ReviewStory, NavLink } from './types';
+import { Service, ReviewStory, NavLink, CaseStudy } from './types';
 
 export const NAV_LINKS: NavLink[] = [
+  { label: 'Кейсы', href: '#cases' },
   { label: 'Услуги', href: '#services' },
-  { label: 'Клуб', href: '#club' },
   { label: 'Отзывы', href: '#reviews' },
   { label: 'Контакты', href: '#contact' },
 ];
@@ -122,6 +122,80 @@ export const REVIEWS: ReviewStory[] = [
         image: 'https://i.ibb.co/8DQ4LwVq/image.jpg',
         text: '',
       }
+    ]
+  }
+];
+
+export const CASES: CaseStudy[] = [
+  {
+    id: 'ktk',
+    companyName: 'KTK',
+    companyDescription: 'Костромская текстильная компания',
+    title: 'ВЫСТРАИВАНИЕ ОТДЕЛА МАРКЕТИНГА',
+    highlight: 'ЗА 7 МЕСЯЦЕВ',
+    tags: ['Комплексный маркетинг'],
+    tasks: [
+      'Проведены интервью с клиентами',
+      'Внедрена сквозная аналитика',
+      'Разработана стратегия узнаваемости бренда среди швейных компаний',
+      'Подключены каналы — SEO, SMM, контекстная реклама, конференции'
+    ],
+    metrics: [
+      { value: '100', label: 'ОБРАЩЕНИЙ B2B В МЕСЯЦ' },
+      { value: '67 МЛН', label: 'ПРИБЫЛЬ' }
+    ]
+  },
+  {
+    id: 'dr-mun',
+    companyName: 'DR.MUN',
+    companyDescription: 'Стоматологическая клиника Dr. Mun',
+    title: 'ВЫСТРАИВАНИЕ ОТДЕЛА МАРКЕТИНГА',
+    highlight: 'ЗА 8 МЕСЯЦЕВ',
+    tags: ['Комплексный маркетинг', 'SMM'],
+    tasks: [
+      'Разработка стратегии продвижения компании',
+      'Разработка brand book и сайта',
+      'Упаковка всех интернет ресурсов',
+      'Запуск каналов привлечения — SMM, блогеры, SEO и контекстная реклама'
+    ],
+    metrics: [
+      { value: '600', label: 'ЗАЯВОК В МЕСЯЦ' },
+      { value: '28 МЛН', label: 'ПРИБЫЛЬ КОМПАНИИ' }
+    ]
+  },
+  {
+    id: 'uniprof',
+    companyName: 'UNIPROF',
+    companyDescription: 'Международная академия интегративных врачей',
+    title: 'РАЗРАБОТКА И ПРОДВИЖЕНИЕ',
+    highlight: 'ОНЛАЙН-КУРСА',
+    tags: ['Разработка сайта', 'CRM и аналитика'],
+    tasks: [
+      'Проведены исследования для снижения сроков и рекламного бюджета',
+      'Разработана программа курса и сайт',
+      'Стратегия продвижения',
+      'Запуск каналов привлечения клиентов'
+    ],
+    metrics: [
+      { value: '160', label: 'ЗАКАЗОВ' },
+      { value: '4,5 МЛН', label: 'ПРИБЫЛЬ' }
+    ]
+  },
+  {
+    id: 'cho',
+    companyName: 'Chō',
+    companyDescription: 'Ресторан Chō',
+    title: 'УВЕЛИЧЕНИЕ УЗНАВАЕМОСТИ',
+    highlight: 'И ПРИВЛЕЧЕНИЕ КЛИЕНТОВ',
+    tags: ['Карты и агрегаторы', 'Креативный маркетинг'],
+    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800&h=400', 
+    tasks: [
+      'Подключены каналы привлечения — Яндекс карты, 2ГИС, Google maps',
+      'Разработан сайт для получения брони'
+    ],
+    metrics: [
+      { value: '58%', label: 'РОСТ ЗВОНКОВ' },
+      { value: '588', label: 'ЗВОНКОВ В МЕСЯЦ' }
     ]
   }
 ];
