@@ -3,12 +3,11 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
-    // Загружаем переменные из .env файлов в корне проекта
+    // Загружаем переменные из всех .env файлов
     const env = loadEnv(mode, process.cwd(), '');
     
-    // Определяем приоритет: сначала ищем API_KEY (стандарт для контейнеров), 
-    // затем GEMINI_API_KEY (стандарт для локальной разработки)
-    const apiKey = env.API_KEY || env.GEMINI_API_KEY || process.env.API_KEY || '';
+    // Собираем ключ из всех возможных источников
+    const apiKey = env.VITE_API_KEY || env.GEMINI_API_KEY || env.API_KEY || process.env.API_KEY || '';
 
     return {
       server: {
@@ -17,9 +16,10 @@ export default defineConfig(({ mode }) => {
       },
       plugins: [react()],
       define: {
-        // Явно прокидываем переменную в глобальную область видимости браузера
+        // Прокидываем в браузер под разными именами для совместимости
         'process.env.API_KEY': JSON.stringify(apiKey),
-        'process.env.GEMINI_API_KEY': JSON.stringify(apiKey)
+        'process.env.GEMINI_API_KEY': JSON.stringify(apiKey),
+        'process.env.VITE_API_KEY': JSON.stringify(apiKey)
       },
       build: {
         outDir: 'dist',
