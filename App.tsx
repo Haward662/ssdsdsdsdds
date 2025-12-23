@@ -1,7 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
-import { GoogleGenAI } from "@google/genai";
 import { SERVICES, REVIEWS, NAV_LINKS, CASES, PROJECTS } from './constants.tsx';
 import { Service, ReviewStory, CaseStudy, Project } from './types.ts';
 
