@@ -23,8 +23,8 @@ const AIChatAssistant = ({ onLeadCapture }: { onLeadCapture: () => void }) => {
 
   const QUICK_QUESTIONS = [
     "Как увеличить заказы?",
-    "Сколько стоит клиент?",
-    "Нужен ли мне сайт?",
+    "Стоимость клиента?",
+    "Нужен ли нам сайт?",
     "Кейсы по роллам"
   ];
 
@@ -46,7 +46,6 @@ const AIChatAssistant = ({ onLeadCapture }: { onLeadCapture: () => void }) => {
 
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      GEMINI_API_KEY=AIzaSyBvIUrsdcT3S9upKY-I89eQPaLeQq_Y0BM
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: [
@@ -54,15 +53,13 @@ const AIChatAssistant = ({ onLeadCapture }: { onLeadCapture: () => void }) => {
           { role: 'user', parts: [{ text: userMessage }] }
         ],
         config: {
-          systemInstruction: `Ты — AI-ассистент маркетингового агентства ProBoost. Твоя задача — помочь владельцу доставки еды понять, как увеличить заказы и прибыль, и аккуратно привести его к заявке. 
-          Ты не продаёшь напрямую. Ты объясняешь, задаёшь вопросы и показываешь логику. Общайся просто, по делу, без маркетинговых терминов, без давления.
-          Аудитория: владельцы доставок еды (пиццерии, суши, роллы, фастфуд). Они хотят больше заказов, а не «отчётов».
+          systemInstruction: `Ты — AI-ассистент маркетингового агентства ProBoost. Твоя задача — помочь владельцу доставки еды понять, как увеличить заказы и прибыль. 
+          Ты эксперт в маркетинге доставок. Общайся профессионально, но доступно.
           ПРАВИЛА:
-          1. Задавай ТОЛЬКО ОДИН простой вопрос за раз.
-          2. Используй только эти факты: клиенты от 70–150 ₽, рассылки с ROI ~850%, рост выручки с 1,8 млн до 2,4 млн ₽, 220 клиентов за первый месяц, 28 повторных заказов за неделю.
-          3. Если человек интересуется стоимостью или запуском, скажи: "Чтобы сказать точно, подойдёт ли это именно вам, нужно посмотреть город, средний чек и текущую рекламу. Могу передать вас специалисту, который бесплатно посчитает окупаемость. Оставить заявку?".
-          4. Тон: спокойный, уверенный, без эмоций и смайлов.
-          Используй инструмент Google Search, если пользователь спрашивает про конкретные города или конкурентов.`,
+          1. Задавай по одному вопросу за раз, веди клиента к записи на аудит.
+          2. Используй факты: средний ROI x3.5, окупаемость в 1-й месяц.
+          3. Тон: уверенный, экспертный, деловой.
+          Используй Google Search, если пользователь спрашивает про свой город или конкретных конкурентов.`,
           tools: [{ googleSearch: {} }],
           temperature: 0.7,
         }
@@ -83,7 +80,7 @@ const AIChatAssistant = ({ onLeadCapture }: { onLeadCapture: () => void }) => {
 
     } catch (error) {
       console.error("AI Error:", error);
-      setMessages(prev => [...prev, { role: 'model', text: "Извините, произошла техническая заминка. Проверьте API ключ в .env.local или попробуйте позже." }]);
+      setMessages(prev => [...prev, { role: 'model', text: "Извините, произошла техническая заминка. Попробуйте еще раз или оставьте заявку через форму." }]);
     } finally {
       setIsTyping(false);
     }
@@ -97,7 +94,7 @@ const AIChatAssistant = ({ onLeadCapture }: { onLeadCapture: () => void }) => {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="absolute bottom-20 right-0 w-[90vw] md:w-[420px] h-[600px] glass-card rounded-[2.5rem] border border-white/10 shadow-2xl flex flex-col overflow-hidden backdrop-blur-3xl bg-black/90"
+            className="absolute bottom-20 right-0 w-[90vw] md:w-[420px] h-[600px] glass-card rounded-[2.5rem] border border-white/10 shadow-2xl flex flex-col overflow-hidden backdrop-blur-3xl bg-black/95"
           >
             {/* Header */}
             <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
@@ -184,9 +181,9 @@ const AIChatAssistant = ({ onLeadCapture }: { onLeadCapture: () => void }) => {
                 <button 
                   onClick={() => handleSendMessage()}
                   disabled={isTyping || !inputValue.trim()}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-indigo-500 disabled:opacity-30 hover:scale-110 active:scale-95 transition-all bg-white/5 rounded-xl border border-white/5 shadow-lg"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-indigo-500 disabled:opacity-30 hover:scale-110 active:scale-95 transition-all bg-white/5 rounded-xl border border-white/5"
                 >
-                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
               </div>
             </div>
