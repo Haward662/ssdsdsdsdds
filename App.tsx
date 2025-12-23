@@ -24,7 +24,7 @@ const AIChatAssistant = ({ onLeadCapture }: { onLeadCapture: () => void }) => {
   const QUICK_QUESTIONS = [
     "Как увеличить заказы?",
     "Стоимость клиента?",
-    "Нужен ли нам сайт?",
+    "Нужен ли мне сайт?",
     "Кейсы по роллам"
   ];
 
@@ -40,12 +40,24 @@ const AIChatAssistant = ({ onLeadCapture }: { onLeadCapture: () => void }) => {
     const userMessage = textOverride || inputValue.trim();
     if (!userMessage || isTyping) return;
 
+    // Проверка ключа перед отправкой
+    const apiKey = process.env.API_KEY;
+    if (!apiKey || apiKey === 'undefined' || apiKey === '') {
+      console.error("Критическая ошибка: API_KEY не найден в process.env");
+      setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
+      setMessages(prev => [...prev, { 
+        role: 'model', 
+        text: "Ошибка конфигурации: API ключ не найден. Пожалуйста, проверьте файл .env.local и перезапустите сервер (npm run dev)." 
+      }]);
+      return;
+    }
+
     setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
     setInputValue('');
     setIsTyping(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey });
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: [
@@ -58,8 +70,7 @@ const AIChatAssistant = ({ onLeadCapture }: { onLeadCapture: () => void }) => {
           ПРАВИЛА:
           1. Задавай по одному вопросу за раз, веди клиента к записи на аудит.
           2. Используй факты: средний ROI x3.5, окупаемость в 1-й месяц.
-          3. Тон: уверенный, экспертный, деловой.
-          Используй Google Search, если пользователь спрашивает про свой город или конкретных конкурентов.`,
+          3. Тон: уверенный, экспертный, деловой.`,
           tools: [{ googleSearch: {} }],
           temperature: 0.7,
         }
