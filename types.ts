@@ -42,3 +42,15 @@ export interface CaseStudy {
   imageUrl?: string; // опционально картинка/график
   linkUrl: string; // ссылка на полный кейс
 }
+
+export interface Project {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  features: string[]; // bullet points
+  footerText?: string;
+  linkUrl: string;
+  linkLabel: string;
+  gradient: string; // CSS class for gradient accent
+}

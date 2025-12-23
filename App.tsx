@@ -2,8 +2,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 import { GoogleGenAI } from "@google/genai";
-import { SERVICES, REVIEWS, NAV_LINKS, CASES } from './constants.tsx';
-import { Service, ReviewStory, CaseStudy } from './types.ts';
+import { SERVICES, REVIEWS, NAV_LINKS, CASES, PROJECTS } from './constants.tsx';
+import { Service, ReviewStory, CaseStudy, Project } from './types.ts';
 
 const LOGO_URL = "https://i.ibb.co/0pzdjPSh/Chat-GPT-Image-22-2025-12-19-19.png";
 
@@ -498,6 +498,73 @@ const StrategyVideoSection = () => {
   );
 };
 
+// --- Projects Section ---
+const ProjectsSection = () => {
+  return (
+    <section id="projects" className="py-24 md:py-32 px-6 md:px-8 bg-black relative">
+       <div className="max-w-[1400px] mx-auto">
+         <h2 className="text-5xl md:text-7xl font-black text-white uppercase italic mb-16 md:mb-24 tracking-tighter leading-none">
+           МОИ <span className="text-indigo-600">ПРОЕКТЫ</span>
+         </h2>
+         
+         <div className="grid md:grid-cols-3 gap-8">
+           {PROJECTS.map((project, index) => (
+             <motion.div
+                key={project.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="group relative glass-card p-8 md:p-10 rounded-[2.5rem] flex flex-col h-full hover:bg-white/5 transition-colors border border-white/10"
+             >
+                {/* Gradient Accent */}
+                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${project.gradient} opacity-10 blur-[50px] rounded-full group-hover:opacity-20 transition-opacity`} />
+                
+                <h3 className="text-3xl font-black text-white uppercase italic tracking-tighter mb-4 leading-none">{project.title}</h3>
+                
+                <p className="text-indigo-400 font-bold uppercase text-xs tracking-widest mb-6 min-h-[3rem]">
+                  {project.subtitle}
+                </p>
+                
+                <p className="text-white/60 text-sm leading-relaxed mb-6">
+                  {project.description}
+                </p>
+                
+                <div className="flex-grow space-y-4 mb-8">
+                   <ul className="space-y-3">
+                     {project.features.map((feature, i) => (
+                       <li key={i} className="flex items-start gap-3 text-xs md:text-sm text-white/80 font-medium">
+                         <span className="mt-1.5 w-1 h-1 rounded-full bg-indigo-500 flex-shrink-0" />
+                         {feature}
+                       </li>
+                     ))}
+                   </ul>
+                   {project.footerText && (
+                      <p className="text-xs text-white/40 italic mt-4 pt-4 border-t border-white/5">
+                        {project.footerText}
+                      </p>
+                   )}
+                </div>
+                
+                <a 
+                  href={project.linkUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="mt-auto inline-flex items-center gap-3 text-white group-hover:text-indigo-400 transition-colors uppercase font-black tracking-widest text-sm"
+                >
+                  <span>{project.linkLabel}</span>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="group-hover:translate-x-1 transition-transform">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </a>
+             </motion.div>
+           ))}
+         </div>
+       </div>
+    </section>
+  );
+};
+
 // --- Services Section ---
 const ServicesSection = () => (
   <section id="services" className="relative py-20 md:py-32 px-6 md:px-8 bg-neutral-950">
@@ -698,6 +765,7 @@ const App = () => {
             <ServicesSection />
             <SmartFunnel />
             <StrategyVideoSection />
+            <ProjectsSection />
             <StoriesSection />
             <ContactSection />
           </main>

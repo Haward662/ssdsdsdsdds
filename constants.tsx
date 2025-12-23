@@ -1,9 +1,10 @@
 
-import { Service, ReviewStory, NavLink, CaseStudy } from './types';
+import { Service, ReviewStory, NavLink, CaseStudy, Project } from './types';
 
 export const NAV_LINKS: NavLink[] = [
   { label: 'Кейсы', href: '#cases' },
   { label: 'Услуги', href: '#services' },
+  { label: 'Проекты', href: '#projects' },
   { label: 'Отзывы', href: '#reviews' },
   { label: 'Контакты', href: '#contact' },
 ];
@@ -202,5 +203,40 @@ export const CASES: CaseStudy[] = [
       { value: '850%', label: 'ROI' }
     ],
     linkUrl: 'https://teletype.in/@proboost/xFMDVIBbSYo'
+  }
+];
+
+export const PROJECTS: Project[] = [
+  {
+    id: 'traffic-2026',
+    title: 'ТРАФИК ЗА КОПЕЙКИ 2026',
+    subtitle: 'Система привлечения клиентов с минимальной стоимостью заявки',
+    description: 'Показываю, как получать заявки из холодного трафика: ВКонтакте, рассылки, базы, автоворонки и простые связки, которые работают в 2026 году.',
+    features: ['Подходит для бизнеса, маркетологов и агентств, которым важен результат, а не «охваты».'],
+    linkUrl: 'https://t.me/trafficnomoney_bot',
+    linkLabel: 'Подробнее',
+    gradient: 'from-blue-500 to-indigo-600'
+  },
+  {
+    id: 'stat-bot',
+    title: 'STAT BOT',
+    subtitle: 'Telegram-бот для контроля рекламы без рекламного кабинета',
+    description: 'Бот автоматически собирает статистику из таргета ВКонтакте и отправляет отчёты прямо вам в Telegram — по расписанию.',
+    features: ['сколько заявок', 'какая цена', 'сливается реклама или нет'],
+    footerText: 'Без ручной проверки и лишних действий.',
+    linkUrl: 'https://t.me/ggpprews_bot',
+    linkLabel: 'Подробнее',
+    gradient: 'from-indigo-500 to-purple-600'
+  },
+  {
+    id: 'proboost',
+    title: 'PROBOOST',
+    subtitle: 'Маркетинговое агентство с фокусом на результат',
+    description: 'Строим маркетинг для бизнеса: таргет, рассылки, автоворонки, CRM и возврат клиентов.',
+    features: ['заявки', 'продажи', 'рост выручки'],
+    footerText: 'Работаем с нишами, где важна окупаемость с первого месяца.',
+    linkUrl: 'https://vk.com/proboostsmm',
+    linkLabel: 'Подробнее',
+    gradient: 'from-purple-500 to-pink-600'
   }
 ];
