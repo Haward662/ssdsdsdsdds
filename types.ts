@@ -1,9 +1,10 @@
+
 export interface Service {
   id: string;
   title: string;
+  subtitle: string;
   description: string;
-  icon: string;
-  price?: string;
+  icons: string[];
 }
 
 export interface StorySlide {

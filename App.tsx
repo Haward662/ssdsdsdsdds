@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 import { SERVICES, REVIEWS, NAV_LINKS } from './constants';
-import { Service, ReviewStory } from './types';
+import { ReviewStory } from './types';
 
 const LOGO_URL = "https://i.ibb.co/0pzdjPSh/Chat-GPT-Image-22-2025-12-19-19.png";
 
@@ -209,6 +209,71 @@ const Hero = ({ onOpenQuiz }: { onOpenQuiz: () => void }) => {
   );
 };
 
+// --- Services Section ---
+const ServicesSection = ({ onOpenQuiz }: { onOpenQuiz: () => void }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const visibleServices = isExpanded ? SERVICES : SERVICES.slice(0, 3);
+
+  return (
+    <section id="services" className="relative py-24 md:py-40 px-6 md:px-8 bg-neutral-950 overflow-hidden">
+      <div className="max-w-[1400px] mx-auto relative z-10">
+        <div className="text-center mb-16 md:mb-24">
+          <h2 className="text-5xl md:text-[6rem] font-black text-white uppercase italic tracking-tighter leading-none mb-6">НАШИ <span className="text-indigo-600">УСЛУГИ</span></h2>
+          <div className="h-1 w-24 bg-indigo-600 mx-auto rounded-full" />
+        </div>
+
+        <motion.div 
+          layout
+          className="grid md:grid-cols-3 gap-6 md:gap-8"
+        >
+          <AnimatePresence mode="popLayout">
+            {visibleServices.map((service, index) => (
+              <motion.div 
+                key={service.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                transition={{ duration: 0.4, delay: index * 0.05 }}
+                whileHover={{ y: -10 }}
+                className="glass-card rounded-[2rem] md:rounded-[3rem] p-8 md:p-12 flex flex-col items-center text-center group transition-all duration-500 hover:border-indigo-500/50"
+              >
+                <div className="flex items-center justify-center gap-4 mb-10 md:mb-14 flex-wrap">
+                  {service.icons.map((icon, idx) => (
+                    <motion.div 
+                      key={idx}
+                      whileHover={{ scale: 1.2, rotate: 5 }}
+                      className="w-10 h-10 md:w-12 md:h-12 bg-white/5 rounded-xl p-2.5 backdrop-blur-md flex items-center justify-center border border-white/10 group-hover:bg-indigo-600/20 transition-colors"
+                    >
+                      <img src={icon} alt="platform" className="w-full h-full object-contain filter drop-shadow-md" />
+                    </motion.div>
+                  ))}
+                </div>
+
+                <h3 className="text-2xl md:text-3xl font-black text-white uppercase italic mb-4 tracking-tighter leading-tight">{service.title}</h3>
+                <p className="text-white/40 text-[10px] md:text-xs font-black uppercase tracking-[0.2em] mb-8 leading-relaxed max-w-[250px]">{service.subtitle}</p>
+                
+                <p className="text-white/60 text-sm md:text-base leading-relaxed mb-8 flex-grow">{service.description}</p>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
+
+        <div className="flex justify-center mt-16 md:mt-24">
+          <Magnetic>
+            <button 
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="px-12 py-5 bg-transparent border border-white/10 text-white font-black text-sm md:text-base uppercase tracking-widest hover:border-indigo-600 hover:bg-indigo-600 transition-all glass-card rounded-full"
+            >
+              {isExpanded ? 'Скрыть услуги' : 'Показать больше'}
+            </button>
+          </Magnetic>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 // --- УМНАЯ ВОРОНКА ---
 const SmartFunnel = () => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -281,7 +346,6 @@ const SmartFunnel = () => {
             const scale = useTransform(stepScroll, [0, 0.5, 1], [1.5, 1, 0.4]);
             const opacity = useTransform(stepScroll, [0, 0.2, 0.5, 0.8, 1], [0, 0.5, 1, 0.5, 0]);
             
-            // Note: In Framer Motion 10, we compute values within style or using useTransform directly
             const x = useTransform(radius, r => Math.cos(angle.get()) * r);
             const y = useTransform(radius, r => Math.sin(angle.get()) * r);
             const glow = useTransform(stepScroll, [0.4, 0.5, 0.6], [0, 60, 0]);
@@ -313,30 +377,6 @@ const SmartFunnel = () => {
     </section>
   );
 };
-
-// --- Services Section ---
-const ServicesSection = () => (
-  <section id="services" className="relative py-20 md:py-32 px-6 md:px-8 bg-neutral-950">
-    <div className="max-w-[1400px] mx-auto">
-      <div className="mb-12 md:mb-20 space-y-4 md:space-y-6">
-        <h2 className="text-4xl md:text-7xl lg:text-[7rem] font-black text-white uppercase italic tracking-tighter leading-none">ИНСТРУ<br/><span className="text-white/10">МЕНТЫ</span></h2>
-        <p className="text-white/40 text-sm md:text-xl font-bold uppercase italic tracking-widest max-w-3xl leading-snug">
-          от упаковки смыслов до масштабирования прибыли. Используем только проверенные инструменты для фуд индустрии
-        </p>
-      </div>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-1">
-        {SERVICES.map((s, i) => (
-          <div key={s.id} className="group p-6 md:p-10 bg-white/5 border border-white/5 hover:bg-indigo-600/10 hover:border-indigo-500/20 transition-all duration-300 flex flex-col min-h-[220px] md:min-h-[280px] relative overflow-hidden">
-            <div className="text-3xl md:text-5xl mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-300 origin-left">{s.icon}</div>
-            <h3 className="text-lg md:text-xl lg:text-2xl font-black text-white uppercase mb-2 md:mb-4 tracking-tighter leading-tight">{s.title}</h3>
-            <p className="text-white/40 leading-snug mb-4 md:mb-6 flex-grow text-xs md:text-sm lg:text-base pr-4">{s.description}</p>
-            <div className="absolute right-4 bottom-4 text-white/[0.03] text-5xl md:text-7xl font-black italic select-none">{i+1}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-);
 
 // --- Stories Section ---
 const StoriesSection = () => {
@@ -400,21 +440,47 @@ const StoriesSection = () => {
 
       <AnimatePresence>
         {active && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[3000] bg-black/95 flex items-center justify-center p-4 md:p-6 backdrop-blur-3xl" onClick={() => setActive(null)}>
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }} 
+            className="fixed inset-0 z-[3000] bg-black/95 flex items-center justify-center p-4 md:p-6 backdrop-blur-3xl" 
+            onClick={() => setActive(null)}
+          >
             <div className="relative w-full max-w-[450px] aspect-[9/16] rounded-[2.5rem] md:rounded-[4rem] overflow-hidden bg-neutral-900 border border-white/20 shadow-[0_0_200px_rgba(0,0,0,1)]" onClick={e => e.stopPropagation()}>
-              <img src={active.slides[0].image} className="w-full h-full object-cover" />
-              <div className="absolute top-8 md:top-12 left-6 md:left-8 right-6 md:right-8 flex justify-between items-center">
+              
+              {/* Image or Video Content */}
+              {active.slides[0].videoUrl ? (
+                <div className="w-full h-full bg-black">
+                  <iframe
+                    src={active.slides[0].videoUrl}
+                    className="w-full h-full"
+                    frameBorder="0"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              ) : (
+                <img src={active.slides[0].image} className="w-full h-full object-cover" />
+              )}
+
+              {/* Header Info */}
+              <div className="absolute top-8 md:top-12 left-6 md:left-8 right-6 md:right-8 flex justify-between items-center z-20">
                 <div className="flex items-center gap-4 md:gap-5">
                   <img src={active.avatar} className="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-indigo-600 object-cover shadow-lg" />
                   <span className="font-black text-white uppercase tracking-tighter text-lg md:text-xl italic drop-shadow-md">{active.username}</span>
                 </div>
                 <button onClick={() => setActive(null)} className="text-white p-2 bg-black/40 rounded-full hover:bg-black/60 transition-colors"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
               </div>
-              <div className="absolute bottom-8 md:bottom-12 left-6 md:left-8 right-6 md:right-8">
-                <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="bg-black/60 backdrop-blur-md p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-white/10 shadow-2xl">
-                    <p className="text-white text-lg md:text-xl font-bold uppercase italic leading-tight">{active.slides[0].text}</p>
-                </motion.div>
-              </div>
+
+              {/* Text Comment (only if exists) */}
+              {active.slides[0].text && (
+                <div className="absolute bottom-8 md:bottom-12 left-6 md:left-8 right-6 md:right-8 z-20">
+                  <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="bg-black/60 backdrop-blur-md p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-white/10 shadow-2xl">
+                      <p className="text-white text-lg md:text-xl font-bold uppercase italic leading-tight">{active.slides[0].text}</p>
+                  </motion.div>
+                </div>
+              )}
             </div>
           </motion.div>
         )}
@@ -478,7 +544,7 @@ const App = () => {
           <Navbar onOpenQuiz={() => setIsQuiz(true)} />
           <main>
             <Hero onOpenQuiz={() => setIsQuiz(true)} />
-            <ServicesSection />
+            <ServicesSection onOpenQuiz={() => setIsQuiz(true)} />
             <SmartFunnel />
             <StoriesSection />
             <ContactSection />

@@ -10,40 +10,71 @@ export const NAV_LINKS: NavLink[] = [
 
 export const SERVICES: Service[] = [
   {
-    id: 'vk',
-    title: 'ВКонтакте под ключ',
-    description: 'Полное управление: контент, рассылки, чат-боты и таргет для максимальных продаж.',
-    icon: '📱',
+    id: 'smm',
+    title: 'SMM',
+    subtitle: 'Телеграмм, Вконтакте, Одноклассники, Youtube, Tik tok',
+    description: 'Комплексное ведение соцсетей для создания лояльного комьюнити и регулярных продаж через контент.',
+    icons: [
+      'https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/f/f3/VK_Compact_Logo_%282021-present%29.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/c/c2/Odnoklassniki_Logo.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg',
+      'https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg'
+    ],
   },
   {
-    id: 'yandex',
-    title: 'Яндекс Директ',
-    description: 'Горячий трафик из поиска и сетей. Оптимизация стоимости заказа (CPA).',
-    icon: '🎯',
+    id: 'context',
+    title: 'КОНТЕКСТНАЯ РЕКЛАМА',
+    subtitle: 'Google, Яндекс',
+    description: 'Привлекаем горячих клиентов, которые ищут доставку еды прямо сейчас в поисковых системах.',
+    icons: [
+      'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_\"G\"_logo.svg',
+      'https://yastatic.net/s3/home/logos/share/yandex_ru.png'
+    ],
   },
   {
     id: 'target',
-    title: 'Таргет',
-    description: 'Точечная настройка рекламы на вашу целевую аудиторию в соцсетях.',
-    icon: '⚡',
-  },
-  {
-    id: 'geo',
-    title: 'Геомаркетинг',
-    description: 'Доминирование в 2ГИС и Яндекс Картах. Собираем всех, кто ищет еду рядом.',
-    icon: '📍',
-  },
-  {
-    id: 'retention',
-    title: 'Работа с базой',
-    description: 'Возвращаем клиентов через рассылки и автопрозвоны. Увеличиваем LTV.',
-    icon: '🔄',
+    title: 'ТАРГЕТИРОВАННАЯ РЕКЛАМА',
+    subtitle: 'Телеграмм, Вконтакте, Одноклассники, MyTarget',
+    description: 'Настраиваем точный захват аудитории по интересам, геолокации и поведению в социальных сетях.',
+    icons: [
+      'https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/f/f3/VK_Compact_Logo_%282021-present%29.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/c/c2/Odnoklassniki_Logo.svg',
+      'https://my.target.com/favicon.ico'
+    ],
   },
   {
     id: 'vibe-coding',
-    title: 'Вайб кодинг',
-    description: 'Разработка умных чат-ботов и игровых механик для вовлечения аудитории.',
-    icon: '💻',
+    title: 'ВАЙБ КОДИНГ',
+    subtitle: 'Автоматизация, Геймификация, Розыгрыши',
+    description: 'Автоматизация индивидуальных решений, создание уникальных геймификаций и розыгрышей для взрывного роста охватов и лояльности.',
+    icons: [
+      'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/d/d5/Tailwind_CSS_Logo.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg'
+    ],
+  },
+  {
+    id: 'geo',
+    title: 'ГЕОМАРКЕТИНГ',
+    subtitle: '2ГИС, Яндекс Карты, Google Maps',
+    description: 'Доминирование в локальном поиске. Собираем всех, кто ищет еду рядом с вашим заведением.',
+    icons: [
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Google_Maps_icon_%282020%29.svg/1024px-Google_Maps_icon_%282020%29.svg.png',
+      'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_\"G\"_logo.svg',
+      'https://yastatic.net/s3/home/logos/share/yandex_ru.png'
+    ],
+  },
+  {
+    id: 'crm',
+    title: 'РАБОТА С БАЗОЙ',
+    subtitle: 'Рассылки, CRM, Автопрозвоны',
+    description: 'Возвращаем клиентов и увеличиваем LTV. Работаем с вашей текущей базой для повторных заказов.',
+    icons: [
+      'https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg',
+      'https://www.gstatic.com/images/branding/product/2x/gmail_64dp.png'
+    ],
   }
 ];
 
@@ -55,11 +86,7 @@ export const REVIEWS: ReviewStory[] = [
     slides: [
       {
         image: 'https://i.ibb.co/jkPSzrR8/2025-12-22-10-54-01.jpg',
-        text: 'Данил, здравствуйте! Хотела благодарность выразить и похвалить, что активность хорошо подросла! 🙏',
-      },
-      {
-        image: 'https://i.ibb.co/0yDSx7hh/3.jpg',
-        text: 'Продолжайте в том же духе! Результаты очень радуют команду. ❤️',
+        text: '',
       }
     ]
   },
@@ -70,7 +97,8 @@ export const REVIEWS: ReviewStory[] = [
     slides: [
       {
         image: 'https://images.unsplash.com/photo-1512152272829-e3139592d56f?auto=format&fit=crop&q=80&w=400&h=700',
-        text: 'Видео-отзыв от Марины: результаты работы за прошлый месяц! ❤️',
+        videoUrl: 'https://kinescope.io/embed/ht1Dnzhiq2F1XVbMg3LijD',
+        text: '',
       }
     ]
   },
@@ -81,7 +109,7 @@ export const REVIEWS: ReviewStory[] = [
     slides: [
       {
         image: 'https://i.ibb.co/wrYChWkt/image.jpg',
-        text: 'Положительная динамика по всем каналам трафика. Работаем дальше!',
+        text: '',
       }
     ]
   },
@@ -92,7 +120,7 @@ export const REVIEWS: ReviewStory[] = [
     slides: [
       {
         image: 'https://i.ibb.co/8DQ4LwVq/image.jpg',
-        text: 'За первый месяц сотрудничества увеличили количество заказов в 2 раза.',
+        text: '',
       }
     ]
   }
