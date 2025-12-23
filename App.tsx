@@ -21,6 +21,13 @@ const AIChatAssistant = ({ onLeadCapture }: { onLeadCapture: () => void }) => {
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  const QUICK_QUESTIONS = [
+    "Как увеличить заказы?",
+    "Сколько стоит клиент?",
+    "Нужен ли мне сайт?",
+    "Кейсы по роллам"
+  ];
+
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -29,16 +36,17 @@ const AIChatAssistant = ({ onLeadCapture }: { onLeadCapture: () => void }) => {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const handleSendMessage = async () => {
-    if (!inputValue.trim() || isTyping) return;
+  const handleSendMessage = async (textOverride?: string) => {
+    const userMessage = textOverride || inputValue.trim();
+    if (!userMessage || isTyping) return;
 
-    const userMessage = inputValue.trim();
     setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
     setInputValue('');
     setIsTyping(true);
 
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      GEMINI_API_KEY=AIzaSyBvIUrsdcT3S9upKY-I89eQPaLeQq_Y0BM
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: [
@@ -54,7 +62,7 @@ const AIChatAssistant = ({ onLeadCapture }: { onLeadCapture: () => void }) => {
           2. Используй только эти факты: клиенты от 70–150 ₽, рассылки с ROI ~850%, рост выручки с 1,8 млн до 2,4 млн ₽, 220 клиентов за первый месяц, 28 повторных заказов за неделю.
           3. Если человек интересуется стоимостью или запуском, скажи: "Чтобы сказать точно, подойдёт ли это именно вам, нужно посмотреть город, средний чек и текущую рекламу. Могу передать вас специалисту, который бесплатно посчитает окупаемость. Оставить заявку?".
           4. Тон: спокойный, уверенный, без эмоций и смайлов.
-          Используй инструмент Google Search, если пользователь спрашивает про свой город или конкурентов.`,
+          Используй инструмент Google Search, если пользователь спрашивает про конкретные города или конкурентов.`,
           tools: [{ googleSearch: {} }],
           temperature: 0.7,
         }
@@ -75,7 +83,7 @@ const AIChatAssistant = ({ onLeadCapture }: { onLeadCapture: () => void }) => {
 
     } catch (error) {
       console.error("AI Error:", error);
-      setMessages(prev => [...prev, { role: 'model', text: "Извините, произошла техническая заминка. Попробуйте еще раз или оставьте заявку через форму." }]);
+      setMessages(prev => [...prev, { role: 'model', text: "Извините, произошла техническая заминка. Проверьте API ключ в .env.local или попробуйте позже." }]);
     } finally {
       setIsTyping(false);
     }
@@ -89,7 +97,7 @@ const AIChatAssistant = ({ onLeadCapture }: { onLeadCapture: () => void }) => {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="absolute bottom-20 right-0 w-[90vw] md:w-[420px] h-[550px] glass-card rounded-[2.5rem] border border-white/10 shadow-2xl flex flex-col overflow-hidden backdrop-blur-3xl bg-black/90"
+            className="absolute bottom-20 right-0 w-[90vw] md:w-[420px] h-[600px] glass-card rounded-[2.5rem] border border-white/10 shadow-2xl flex flex-col overflow-hidden backdrop-blur-3xl bg-black/90"
           >
             {/* Header */}
             <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
@@ -137,7 +145,30 @@ const AIChatAssistant = ({ onLeadCapture }: { onLeadCapture: () => void }) => {
                   )}
                 </motion.div>
               ))}
+              
+              {isTyping && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
+                  <div className="bg-white/5 p-4 rounded-2xl rounded-tl-none border border-white/10 flex gap-1">
+                    <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                    <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                    <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" />
+                  </div>
+                </motion.div>
+              )}
               <div ref={chatEndRef} />
+            </div>
+
+            {/* Quick Actions */}
+            <div className="px-5 py-3 flex gap-2 overflow-x-auto no-scrollbar border-t border-white/5">
+              {QUICK_QUESTIONS.map((q, i) => (
+                <button 
+                  key={i}
+                  onClick={() => handleSendMessage(q)}
+                  className="flex-shrink-0 px-4 py-2 bg-white/5 hover:bg-indigo-600/20 border border-white/10 rounded-full text-[10px] font-black uppercase tracking-wider text-white/40 hover:text-white transition-all italic"
+                >
+                  {q}
+                </button>
+              ))}
             </div>
 
             {/* Footer Form */}
@@ -151,15 +182,11 @@ const AIChatAssistant = ({ onLeadCapture }: { onLeadCapture: () => void }) => {
                   className="w-full bg-black/60 border border-white/10 rounded-2xl py-4.5 pl-5 pr-14 text-sm text-white focus:outline-none focus:border-indigo-600 transition-all font-bold italic placeholder:text-white/10"
                 />
                 <button 
-                  onClick={handleSendMessage}
-                  disabled={isTyping}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-indigo-500 disabled:opacity-30 hover:scale-110 active:scale-95 transition-all bg-white/5 rounded-xl border border-white/5"
+                  onClick={() => handleSendMessage()}
+                  disabled={isTyping || !inputValue.trim()}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-indigo-500 disabled:opacity-30 hover:scale-110 active:scale-95 transition-all bg-white/5 rounded-xl border border-white/5 shadow-lg"
                 >
-                  {isTyping ? (
-                    <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                  )}
+                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
               </div>
             </div>
