@@ -7,6 +7,24 @@ import { Service, ReviewStory, CaseStudy, Project } from './types.ts';
 
 const LOGO_URL = "https://i.ibb.co/0pzdjPSh/Chat-GPT-Image-22-2025-12-19-19.png";
 
+// --- Telegram Configuration ---
+const TG_BOT_TOKEN = "7992134867:AAHvzioRtduTTn1_k4PqaK3RHON3O5N_F20";
+const TG_CHAT_ID = "659606427";
+
+const sendTelegramMessage = async (name: string, contact: string, source: string) => {
+  const text = encodeURIComponent(
+    `🚀 *НОВАЯ ЗАЯВКА* (${source})\n\n👤 *Имя:* ${name}\n📱 *Контакт:* ${contact}`
+  );
+  
+  try {
+    const response = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage?chat_id=${TG_CHAT_ID}&text=${text}&parse_mode=Markdown`);
+    return response.ok;
+  } catch (error) {
+    console.error("Telegram send error:", error);
+    return false;
+  }
+};
+
 // --- Loading Screen Component ---
 const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
   const [progress, setProgress] = useState(0);
@@ -122,7 +140,27 @@ const Magnetic = ({ children, strength = 0.35 }: { children?: React.ReactNode, s
 
 // --- Lead Modal ---
 const LeadModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  const [name, setName] = useState('');
+  const [contact, setContact] = useState('');
+  const [isSending, setIsSending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSending(true);
+    const success = await sendTelegramMessage(name, contact, "Всплывающее окно");
+    setIsSending(false);
+    if (success) {
+      alert("Заявка успешно отправлена!");
+      setName('');
+      setContact('');
+      onClose();
+    } else {
+      alert("Ошибка отправки. Попробуйте еще раз.");
+    }
+  };
+
   if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/95 backdrop-blur-3xl">
       <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="relative w-full max-w-xl glass-card rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-16 border border-white/10 shadow-2xl text-center">
@@ -130,10 +168,27 @@ const LeadModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
         <h2 className="text-3xl md:text-5xl font-black text-white uppercase italic mb-8 leading-none">ОБСУДИТЬ<br/><span className="text-indigo-500">ПРОЕКТ</span></h2>
-        <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); onClose(); }}>
-          <input required placeholder="ВАШЕ ИМЯ" className="w-full bg-transparent border-b-2 border-white/10 py-4 md:py-5 text-lg md:text-xl font-bold focus:border-indigo-600 outline-none transition-all text-white" />
-          <input required placeholder="TELEGRAM / WHATSAPP" className="w-full bg-transparent border-b-2 border-white/10 py-4 md:py-5 text-lg md:text-xl font-bold focus:border-indigo-600 outline-none transition-all text-white" />
-          <button className="w-full py-6 md:py-8 bg-white text-black font-black text-lg md:text-xl rounded-2xl hover:bg-indigo-600 hover:text-white transition-all uppercase italic">ОТПРАВИТЬ ЗАЯВКУ</button>
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          <input 
+            required 
+            placeholder="ВАШЕ ИМЯ" 
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full bg-transparent border-b-2 border-white/10 py-4 md:py-5 text-lg md:text-xl font-bold focus:border-indigo-600 outline-none transition-all text-white" 
+          />
+          <input 
+            required 
+            placeholder="TELEGRAM / WHATSAPP" 
+            value={contact}
+            onChange={(e) => setContact(e.target.value)}
+            className="w-full bg-transparent border-b-2 border-white/10 py-4 md:py-5 text-lg md:text-xl font-bold focus:border-indigo-600 outline-none transition-all text-white" 
+          />
+          <button 
+            disabled={isSending}
+            className="w-full py-6 md:py-8 bg-white text-black font-black text-lg md:text-xl rounded-2xl hover:bg-indigo-600 hover:text-white transition-all uppercase italic disabled:opacity-50 disabled:cursor-wait"
+          >
+            {isSending ? "ОТПРАВКА..." : "ОТПРАВИТЬ ЗАЯВКУ"}
+          </button>
         </form>
       </motion.div>
     </div>
@@ -709,6 +764,22 @@ const StoriesSection = () => {
 // --- Contact Section ---
 const ContactSection = () => {
   const [sent, setSent] = useState(false);
+  const [name, setName] = useState('');
+  const [contact, setContact] = useState('');
+  const [isSending, setIsSending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSending(true);
+    const success = await sendTelegramMessage(name, contact, "Форма внизу сайта");
+    setIsSending(false);
+    if (success) {
+      setSent(true);
+    } else {
+      alert("Ошибка отправки. Попробуйте еще раз или напишите нам напрямую.");
+    }
+  };
+
   return (
     <section id="contact" className="py-24 md:py-56 px-6 md:px-8 bg-neutral-950">
       <div className="max-w-[1500px] mx-auto grid lg:grid-cols-2 gap-16 md:gap-32">
@@ -728,10 +799,27 @@ const ContactSection = () => {
                 <p className="text-white/40 mt-4 uppercase font-black text-sm md:text-base">Скоро свяжемся с вами в Telegram.</p>
             </motion.div>
           ) : (
-            <form className="space-y-8 md:space-y-12" onSubmit={(e) => { e.preventDefault(); setSent(true); }}>
-              <input required placeholder="ВАШЕ ИМЯ" className="w-full bg-transparent border-b-2 md:border-b-4 border-white/10 py-4 md:py-8 text-xl md:text-3xl font-black focus:border-indigo-600 outline-none transition-all text-white placeholder:text-white/5" />
-              <input required placeholder="TELEGRAM / ТЕЛЕФОН" className="w-full bg-transparent border-b-2 md:border-b-4 border-white/10 py-4 md:py-8 text-xl md:text-3xl font-black focus:border-indigo-600 outline-none transition-all text-white placeholder:text-white/5" />
-              <button className="w-full py-8 md:py-12 bg-white text-black font-black text-xl md:text-2xl rounded-[2rem] md:rounded-[3rem] hover:bg-indigo-600 hover:text-white transition-all uppercase italic tracking-tighter shadow-2xl">СТАТЬ ПЕРВЫМ В ГОРОДЕ</button>
+            <form className="space-y-8 md:space-y-12" onSubmit={handleSubmit}>
+              <input 
+                required 
+                placeholder="ВАШЕ ИМЯ" 
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full bg-transparent border-b-2 md:border-b-4 border-white/10 py-4 md:py-8 text-xl md:text-3xl font-black focus:border-indigo-600 outline-none transition-all text-white placeholder:text-white/5" 
+              />
+              <input 
+                required 
+                placeholder="TELEGRAM / ТЕЛЕФОН" 
+                value={contact}
+                onChange={(e) => setContact(e.target.value)}
+                className="w-full bg-transparent border-b-2 md:border-b-4 border-white/10 py-4 md:py-8 text-xl md:text-3xl font-black focus:border-indigo-600 outline-none transition-all text-white placeholder:text-white/5" 
+              />
+              <button 
+                disabled={isSending}
+                className="w-full py-8 md:py-12 bg-white text-black font-black text-xl md:text-2xl rounded-[2rem] md:rounded-[3rem] hover:bg-indigo-600 hover:text-white transition-all uppercase italic tracking-tighter shadow-2xl disabled:opacity-50 disabled:cursor-wait"
+              >
+                {isSending ? "ОТПРАВКА..." : "СТАТЬ ПЕРВЫМ В ГОРОДЕ"}
+              </button>
             </form>
           )}
         </div>
