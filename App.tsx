@@ -1,9 +1,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
-import { GoogleGenAI } from "@google/genai";
-import { SERVICES, REVIEWS, NAV_LINKS } from './constants.tsx';
-import { Service, ReviewStory } from './types.ts';
+import { SERVICES, REVIEWS, NAV_LINKS } from './constants';
+import { Service, ReviewStory } from './types';
 
 const LOGO_URL = "https://i.ibb.co/0pzdjPSh/Chat-GPT-Image-22-2025-12-19-19.png";
 
@@ -212,7 +211,7 @@ const Hero = ({ onOpenQuiz }: { onOpenQuiz: () => void }) => {
 
 // --- УМНАЯ ВОРОНКА ---
 const SmartFunnel = () => {
-  const sectionRef = useRef(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"]
@@ -232,7 +231,7 @@ const SmartFunnel = () => {
     <section ref={sectionRef} className="relative h-[800vh] bg-black">
       <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden">
         
-        {/* Intro Text - Adjusted positioning and visibility */}
+        {/* Intro Text */}
         <div className="absolute top-24 md:top-36 flex flex-col items-center select-none pointer-events-none z-30 px-6 text-center">
           <motion.p 
              style={{ 
@@ -281,6 +280,8 @@ const SmartFunnel = () => {
             const angle = useTransform(stepScroll, [0, 0.5, 1], [-Math.PI * 3, 0, Math.PI / 2]);
             const scale = useTransform(stepScroll, [0, 0.5, 1], [1.5, 1, 0.4]);
             const opacity = useTransform(stepScroll, [0, 0.2, 0.5, 0.8, 1], [0, 0.5, 1, 0.5, 0]);
+            
+            // Note: In Framer Motion 10, we compute values within style or using useTransform directly
             const x = useTransform(radius, r => Math.cos(angle.get()) * r);
             const y = useTransform(radius, r => Math.sin(angle.get()) * r);
             const glow = useTransform(stepScroll, [0.4, 0.5, 0.6], [0, 60, 0]);

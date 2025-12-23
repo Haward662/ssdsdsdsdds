@@ -1,5 +1,5 @@
 
-import { Service, ReviewStory, NavLink } from './types.ts';
+import { Service, ReviewStory, NavLink } from './types';
 
 export const NAV_LINKS: NavLink[] = [
   { label: 'Услуги', href: '#services' },
