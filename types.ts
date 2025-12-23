@@ -40,4 +40,5 @@ export interface CaseStudy {
   tasks: string[];
   metrics: CaseMetric[];
   imageUrl?: string; // опционально картинка/график
+  linkUrl: string; // ссылка на полный кейс
 }

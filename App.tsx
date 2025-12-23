@@ -215,7 +215,8 @@ const CasesSection = () => {
   const [filter, setFilter] = useState('Все');
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const categories = ['Все', 'Комплексный маркетинг', 'SMM', 'Разработка сайта', 'Карты и агрегаторы', 'CRM и аналитика'];
+  // Updated categories based on new cases
+  const categories = ['Все', 'Комплексный маркетинг', 'Запуск под ключ', 'Трафик + работа с базой', 'CRM и работа с базой'];
 
   const filteredCases = filter === 'Все' 
     ? CASES 
@@ -274,44 +275,60 @@ const CasesSection = () => {
                 exit={{ opacity: 0, scale: 0.9 }}
                 className="flex-shrink-0 w-full md:w-[600px] bg-[#0a0a0a] border border-white/10 rounded-[2rem] p-8 md:p-10 flex flex-col justify-between group hover:border-indigo-500/30 transition-colors snap-start"
               >
-                {/* Header: Logo & Company Info */}
-                <div className="flex items-start justify-between mb-8 md:mb-12">
-                   <div className="flex flex-col gap-1">
-                      <h3 className="text-3xl md:text-4xl font-black text-white uppercase tracking-tight">{c.companyName}</h3>
-                      <p className="text-[10px] md:text-xs text-white/40 uppercase tracking-widest max-w-[200px]">{c.companyDescription}</p>
-                   </div>
-                   <div className="hidden md:block w-px h-12 bg-white/10 mx-4" />
-                   <div className="hidden md:block text-[10px] text-white/30 uppercase tracking-widest max-w-[150px] text-right">
-                     {c.tags.join(' • ')}
-                   </div>
-                </div>
-
-                {/* Body: Title & Tasks */}
-                <div className="mb-8 md:mb-12">
-                   <h4 className="text-xl md:text-2xl font-light text-white uppercase mb-6 leading-tight">
-                     {c.title} <span className="text-indigo-500 font-bold">{c.highlight}</span>
-                   </h4>
-                   <ul className="space-y-3">
-                     {c.tasks.map((task, i) => (
-                       <li key={i} className="flex items-start gap-3 text-sm text-white/60 font-light">
-                          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/30 flex-shrink-0" />
-                          {task}
-                       </li>
-                     ))}
-                   </ul>
-                </div>
-
-                {/* Footer: Metrics */}
-                <div className="bg-white/[0.03] rounded-2xl p-6 border border-white/5">
-                  <p className="text-[10px] text-white/30 uppercase tracking-widest mb-4">Выход на показатели:</p>
-                  <div className="grid grid-cols-2 gap-4">
-                    {c.metrics.map((m, i) => (
-                      <div key={i}>
-                        <p className="text-2xl md:text-3xl font-medium text-indigo-400 mb-1">{m.value}</p>
-                        <p className="text-[10px] text-white/40 uppercase tracking-wider">{m.label}</p>
-                      </div>
-                    ))}
+                <div>
+                  {/* Header: Logo & Company Info */}
+                  <div className="flex items-start justify-between mb-8 md:mb-12">
+                     <div className="flex flex-col gap-1">
+                        <h3 className="text-3xl md:text-4xl font-black text-white uppercase tracking-tight">{c.companyName}</h3>
+                        <p className="text-[10px] md:text-xs text-white/40 uppercase tracking-widest max-w-[200px]">{c.companyDescription}</p>
+                     </div>
+                     <div className="hidden md:block w-px h-12 bg-white/10 mx-4" />
+                     <div className="hidden md:block text-[10px] text-white/30 uppercase tracking-widest max-w-[150px] text-right">
+                       {c.tags.join(' • ')}
+                     </div>
                   </div>
+
+                  {/* Body: Title & Tasks */}
+                  <div className="mb-8 md:mb-12">
+                     <h4 className="text-xl md:text-2xl font-light text-white uppercase mb-6 leading-tight">
+                       {c.title} <span className="text-indigo-500 font-bold">{c.highlight}</span>
+                     </h4>
+                     <ul className="space-y-3">
+                       {c.tasks.map((task, i) => (
+                         <li key={i} className="flex items-start gap-3 text-sm text-white/60 font-light">
+                            <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-white/30 flex-shrink-0" />
+                            {task}
+                         </li>
+                       ))}
+                     </ul>
+                  </div>
+                </div>
+
+                {/* Footer: Metrics & Link */}
+                <div className="space-y-6">
+                  <div className="bg-white/[0.03] rounded-2xl p-6 border border-white/5">
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest mb-4">Выход на показатели:</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      {c.metrics.map((m, i) => (
+                        <div key={i}>
+                          <p className="text-2xl md:text-3xl font-medium text-indigo-400 mb-1">{m.value}</p>
+                          <p className="text-[10px] text-white/40 uppercase tracking-wider">{m.label}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <a 
+                    href={c.linkUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-white/50 hover:text-white transition-colors group/link cursor-pointer"
+                  >
+                    <span className="text-xs font-black uppercase tracking-widest">Читать кейс</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="group-hover/link:translate-x-1 transition-transform">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </a>
                 </div>
               </motion.div>
             ))}
@@ -434,8 +451,8 @@ const StrategyVideoSection = () => {
 
       <div className="max-w-[1400px] mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-center">
-          {/* Text Content */}
-          <div className="space-y-8 md:space-y-10 order-2 lg:order-1">
+          {/* Text Content - Always first */}
+          <div className="space-y-8 md:space-y-10">
             <h2 className="text-4xl md:text-6xl font-black text-white italic uppercase leading-[0.9] tracking-tighter">
               КАКАЯ ДОЛЖНА БЫТЬ <span className="text-indigo-500">МАРКЕТИНГ СТРАТЕГИЯ</span> И ВОРОНКА ПРОДАЖ?
             </h2>
@@ -455,8 +472,8 @@ const StrategyVideoSection = () => {
             </div>
           </div>
 
-          {/* Video Embed */}
-          <div className="relative order-1 lg:order-2">
+          {/* Video Embed - Always second */}
+          <div className="relative">
             <div className="glass-card p-2 md:p-4 rounded-[2rem] border border-white/10 shadow-2xl relative z-10">
               <div className="relative aspect-video rounded-[1.5rem] overflow-hidden bg-black border border-white/5">
                 <iframe
@@ -560,6 +577,16 @@ const StoriesSection = () => {
             >
               <img src={r.slides[0].image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 opacity-80" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
+              
+              {/* Play icon overlay for videos */}
+              {r.slides[0].videoUrl && (
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform duration-500">
+                      <svg className="w-8 h-8 text-white ml-1" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  </div>
+              )}
+
               <div className="absolute bottom-8 md:bottom-12 left-6 md:left-10 flex items-center gap-4 md:gap-5">
                 <img src={r.avatar} className="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-indigo-600 object-cover" />
                 <span className="font-black text-sm md:text-lg uppercase text-white tracking-widest italic">{r.username}</span>
@@ -573,19 +600,37 @@ const StoriesSection = () => {
         {active && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[3000] bg-black/95 flex items-center justify-center p-4 md:p-6 backdrop-blur-3xl" onClick={() => setActive(null)}>
             <div className="relative w-full max-w-[450px] aspect-[9/16] rounded-[2.5rem] md:rounded-[4rem] overflow-hidden bg-neutral-900 border border-white/20 shadow-[0_0_200px_rgba(0,0,0,1)]" onClick={e => e.stopPropagation()}>
-              <img src={active.slides[0].image} className="w-full h-full object-cover" />
-              <div className="absolute top-8 md:top-12 left-6 md:left-8 right-6 md:right-8 flex justify-between items-center">
-                <div className="flex items-center gap-4 md:gap-5">
+              
+              {active.slides[0].videoUrl ? (
+                 <div className="w-full h-full bg-black">
+                   <iframe 
+                     src={active.slides[0].videoUrl} 
+                     className="w-full h-full"
+                     allow="autoplay; fullscreen; picture-in-picture; encrypted-media; gyroscope; accelerometer; clipboard-write;" 
+                     frameBorder="0" 
+                     allowFullScreen 
+                     title="Review Video"
+                   />
+                 </div>
+              ) : (
+                 <img src={active.slides[0].image} className="w-full h-full object-cover" />
+              )}
+              
+              <div className="absolute top-8 md:top-12 left-6 md:left-8 right-6 md:right-8 flex justify-between items-center pointer-events-none">
+                <div className="flex items-center gap-4 md:gap-5 pointer-events-auto">
                   <img src={active.avatar} className="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-indigo-600 object-cover shadow-lg" />
                   <span className="font-black text-white uppercase tracking-tighter text-lg md:text-xl italic drop-shadow-md">{active.username}</span>
                 </div>
-                <button onClick={() => setActive(null)} className="text-white p-2 bg-black/40 rounded-full hover:bg-black/60 transition-colors"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+                <button onClick={() => setActive(null)} className="text-white p-2 bg-black/40 rounded-full hover:bg-black/60 transition-colors pointer-events-auto"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
               </div>
-              <div className="absolute bottom-8 md:bottom-12 left-6 md:left-8 right-6 md:right-8">
-                <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="bg-black/60 backdrop-blur-md p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-white/10 shadow-2xl">
-                    <p className="text-white text-lg md:text-xl font-bold uppercase italic leading-tight">{active.slides[0].text}</p>
-                </motion.div>
-              </div>
+              
+              {!active.slides[0].videoUrl && (
+                  <div className="absolute bottom-8 md:bottom-12 left-6 md:left-8 right-6 md:right-8">
+                    <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="bg-black/60 backdrop-blur-md p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] border border-white/10 shadow-2xl">
+                        <p className="text-white text-lg md:text-xl font-bold uppercase italic leading-tight">{active.slides[0].text}</p>
+                    </motion.div>
+                  </div>
+              )}
             </div>
           </motion.div>
         )}

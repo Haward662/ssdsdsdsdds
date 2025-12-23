@@ -96,7 +96,7 @@ export const REVIEWS: ReviewStory[] = [
     avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150&h=150',
     slides: [
       {
-        image: 'https://images.unsplash.com/photo-1512152272829-e3139592d56f?auto=format&fit=crop&q=80&w=400&h=700',
+        image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop',
         videoUrl: 'https://kinescope.io/embed/ht1Dnzhiq2F1XVbMg3LijD',
         text: '',
       }
@@ -128,74 +128,79 @@ export const REVIEWS: ReviewStory[] = [
 
 export const CASES: CaseStudy[] = [
   {
-    id: 'ktk',
-    companyName: 'KTK',
-    companyDescription: 'Костромская текстильная компания',
-    title: 'ВЫСТРАИВАНИЕ ОТДЕЛА МАРКЕТИНГА',
-    highlight: 'ЗА 7 МЕСЯЦЕВ',
+    id: 'halal-butik',
+    companyName: 'Halal Butik',
+    companyDescription: 'Халяль-доставка еды',
+    title: '183 НОВЫХ КЛИЕНТА',
+    highlight: 'ЗА МЕСЯЦ',
     tags: ['Комплексный маркетинг'],
     tasks: [
-      'Проведены интервью с клиентами',
-      'Внедрена сквозная аналитика',
-      'Разработана стратегия узнаваемости бренда среди швейных компаний',
-      'Подключены каналы — SEO, SMM, контекстная реклама, конференции'
+      'Таргетированная реклама ВКонтакте',
+      'Персональные рассылки по базе',
+      'Проработка офферов и акций',
+      'Автоворонка повторных касаний'
     ],
     metrics: [
-      { value: '100', label: 'ОБРАЩЕНИЙ B2B В МЕСЯЦ' },
-      { value: '67 МЛН', label: 'ПРИБЫЛЬ' }
-    ]
+      { value: '183', label: 'НОВЫХ КЛИЕНТА' },
+      { value: '78 ₽', label: 'ЦЕНА КЛИЕНТА' }
+    ],
+    linkUrl: 'https://vk.com/@proboostsmm-keis-183-novyh-klientov-dlya-dostavki-edy-za-mesyac'
   },
   {
-    id: 'dr-mun',
-    companyName: 'DR.MUN',
-    companyDescription: 'Стоматологическая клиника Dr. Mun',
-    title: 'ВЫСТРАИВАНИЕ ОТДЕЛА МАРКЕТИНГА',
-    highlight: 'ЗА 8 МЕСЯЦЕВ',
-    tags: ['Комплексный маркетинг', 'SMM'],
+    id: 'okto-pizza',
+    companyName: 'Okto Pizza',
+    companyDescription: 'Доставка пиццы',
+    title: 'ЗАПУСК С НУЛЯ',
+    highlight: '500К ОБОРОТ',
+    tags: ['Запуск под ключ'],
     tasks: [
-      'Разработка стратегии продвижения компании',
-      'Разработка brand book и сайта',
-      'Упаковка всех интернет ресурсов',
-      'Запуск каналов привлечения — SMM, блогеры, SEO и контекстная реклама'
+      'Упаковка сообщества ВКонтакте',
+      'Запуск таргетированной рекламы',
+      'Посевы в локальных сообществах',
+      'Рассылки для возврата клиентов'
     ],
     metrics: [
-      { value: '600', label: 'ЗАЯВОК В МЕСЯЦ' },
-      { value: '28 МЛН', label: 'ПРИБЫЛЬ КОМПАНИИ' }
-    ]
+      { value: '500К', label: 'ОБОРОТ 1 МЕСЯЦ' },
+      { value: 'Flow', label: 'СТАБИЛЬНЫЙ ПОТОК' }
+    ],
+    linkUrl: 'https://vk.com/@-210647270-keis-kak-otkrylis-i-za-pervyi-mesyac-sdelali-oborot-v-500tys'
   },
   {
-    id: 'uniprof',
-    companyName: 'UNIPROF',
-    companyDescription: 'Международная академия интегративных врачей',
-    title: 'РАЗРАБОТКА И ПРОДВИЖЕНИЕ',
-    highlight: 'ОНЛАЙН-КУРСА',
-    tags: ['Разработка сайта', 'CRM и аналитика'],
+    id: 'sushi-34',
+    companyName: 'Суши 34',
+    companyDescription: 'Доставка суши и роллов',
+    title: '220 НОВЫХ КЛИЕНТОВ',
+    highlight: 'РОСТ ЧЕКА',
+    tags: ['Трафик + работа с базой'],
     tasks: [
-      'Проведены исследования для снижения сроков и рекламного бюджета',
-      'Разработана программа курса и сайт',
-      'Стратегия продвижения',
-      'Запуск каналов привлечения клиентов'
+      'Таргет ВКонтакте',
+      'Персональные рассылки',
+      'Акции на первый заказ',
+      'Работа с ушедшими клиентами'
     ],
     metrics: [
-      { value: '160', label: 'ЗАКАЗОВ' },
-      { value: '4,5 МЛН', label: 'ПРИБЫЛЬ' }
-    ]
+      { value: '220', label: 'НОВЫХ КЛИЕНТОВ' },
+      { value: '1600 ₽', label: 'СРЕДНИЙ ЧЕК' }
+    ],
+    linkUrl: 'https://teletype.in/@proboost/ZlmmSvwmpZF'
   },
   {
-    id: 'cho',
-    companyName: 'Chō',
-    companyDescription: 'Ресторан Chō',
-    title: 'УВЕЛИЧЕНИЕ УЗНАВАЕМОСТИ',
-    highlight: 'И ПРИВЛЕЧЕНИЕ КЛИЕНТОВ',
-    tags: ['Карты и агрегаторы', 'Креативный маркетинг'],
-    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800&h=400', 
+    id: 'king-rolls',
+    companyName: 'King Rolls',
+    companyDescription: 'Доставка роллов',
+    title: 'ВОЗВРАТ КЛИЕНТОВ',
+    highlight: 'ROI 850%',
+    tags: ['CRM и работа с базой'],
     tasks: [
-      'Подключены каналы привлечения — Яндекс карты, 2ГИС, Google maps',
-      'Разработан сайт для получения брони'
+      'Сегментация клиентской базы',
+      'Персональные рассылки ВКонтакте',
+      'Триггерные офферы',
+      'Аналитика возвратов'
     ],
     metrics: [
-      { value: '58%', label: 'РОСТ ЗВОНКОВ' },
-      { value: '588', label: 'ЗВОНКОВ В МЕСЯЦ' }
-    ]
+      { value: '44 800', label: 'ВЫРУЧКА С РАССЫЛКИ' },
+      { value: '850%', label: 'ROI' }
+    ],
+    linkUrl: 'https://teletype.in/@proboost/xFMDVIBbSYo'
   }
 ];
