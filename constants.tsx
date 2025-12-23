@@ -1,3 +1,4 @@
+
 import { Service, ReviewStory, NavLink } from './types.ts';
 
 export const NAV_LINKS: NavLink[] = [
@@ -69,7 +70,6 @@ export const REVIEWS: ReviewStory[] = [
     slides: [
       {
         image: 'https://images.unsplash.com/photo-1512152272829-e3139592d56f?auto=format&fit=crop&q=80&w=400&h=700',
-        videoUrl: 'отзыв марина.mp4',
         text: 'Видео-отзыв от Марины: результаты работы за прошлый месяц! ❤️',
       }
     ]
