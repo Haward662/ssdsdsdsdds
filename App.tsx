@@ -3,8 +3,184 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 import { SERVICES, REVIEWS, NAV_LINKS } from './constants';
 import { ReviewStory } from './types';
+import { GoogleGenAI } from "@google/genai";
 
 const LOGO_URL = "https://i.ibb.co/0pzdjPSh/Chat-GPT-Image-22-2025-12-19-19.png";
+
+// --- AI Chat Assistant Component ---
+const AIChatAssistant = ({ onLeadCapture }: { onLeadCapture: () => void }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<{ role: 'user' | 'model'; text: string }[]>([
+    { role: 'model', text: "Привет! Я помогу понять, где вы сейчас теряете заказы и как увеличить прибыль доставки. Скажите, пожалуйста, у вас уже есть реклама или пока только органика?" }
+  ]);
+  const [inputValue, setInputValue] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isTyping]);
+
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() || isTyping) return;
+
+    const userMessage = inputValue.trim();
+    setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
+    setInputValue('');
+    setIsTyping(true);
+
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const chat = ai.chats.create({
+        model: 'gemini-3-flash-preview',
+        config: {
+          systemInstruction: `Ты — AI-ассистент маркетингового агентства ProBoost. Твоя задача — помочь владельцу доставки еды понять, как увеличить заказы и прибыль, и аккуратно привести его к заявке. 
+          Ты не продаёшь напрямую. Ты объясняешь, задаёшь вопросы и показываешь логику. Общайся просто, по делу, без маркетинговых терминов, без давления.
+          Аудитория: владельцы доставок еды (пиццерии, суши, роллы, фастфуд). Они хотят больше заказов, а не «отчётов».
+          ПРАВИЛА:
+          1. Задавай ТОЛЬКО ОДИН простой вопрос за раз (про рекламу, про то где заказывают, про базу).
+          2. Используй только эти факты: клиенты от 70–150 ₽, рассылки с ROI ~850%, рост выручки с 1,8 млн до 2,4 млн ₽, 220 клиентов за первый месяц, 28 повторных заказов за неделю.
+          3. Если человек интересуется стоимостью или запуском, скажи: "Чтобы сказать точно, подойдёт ли это именно вам, нужно посмотреть город, средний чек и текущую рекламу. Могу передать вас специалисту, который бесплатно посчитает окупаемость. Оставить заявку?".
+          4. Тон: спокойный, уверенный, без эмоций и смайлов.
+          ЦЕЛЬ: Довести человека до мысли, что специалистам стоит посмотреть на его проблему.`,
+          temperature: 0.7,
+        },
+        history: messages.map(m => ({ role: m.role, parts: [{ text: m.text }] }))
+      });
+
+      let fullResponse = "";
+      const result = await chat.sendMessageStream({ message: userMessage });
+      
+      setMessages(prev => [...prev, { role: 'model', text: '' }]);
+
+      for await (const chunk of result) {
+        const chunkText = chunk.text;
+        fullResponse += chunkText;
+        setMessages(prev => {
+          const newMessages = [...prev];
+          newMessages[newMessages.length - 1].text = fullResponse;
+          return newMessages;
+        });
+      }
+      
+      // Check if AI suggested leaving a lead
+      if (fullResponse.includes("Оставить заявку?") || fullResponse.toLowerCase().includes("оставить заявку")) {
+        // We could auto-trigger or just let the button handle it
+      }
+
+    } catch (error) {
+      console.error("AI Error:", error);
+      setMessages(prev => [...prev, { role: 'model', text: "Извините, произошла техническая заминка. Попробуйте еще раз или оставьте заявку через форму." }]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  return (
+    <div className="fixed bottom-6 right-6 z-[4000] font-['Inter']">
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="absolute bottom-20 right-0 w-[90vw] md:w-[400px] h-[500px] glass-card rounded-[2rem] border border-white/10 shadow-2xl flex flex-col overflow-hidden backdrop-blur-3xl bg-black/80"
+          >
+            {/* Header */}
+            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50 italic">ProBoost Assistant</span>
+              </div>
+              <button onClick={() => setIsOpen(false)} className="text-white/30 hover:text-white">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-grow overflow-y-auto p-6 space-y-6 no-scrollbar">
+              {messages.map((m, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: m.role === 'user' ? 20 : -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div className={`max-w-[85%] p-4 rounded-2xl text-sm md:text-base font-bold italic leading-relaxed ${
+                    m.role === 'user' 
+                      ? 'bg-indigo-600 text-white rounded-tr-none' 
+                      : 'bg-white/5 text-white/90 border border-white/10 rounded-tl-none'
+                  }`}>
+                    {m.text || <span className="flex gap-1"><span className="animate-bounce">.</span><span className="animate-bounce delay-100">.</span><span className="animate-bounce delay-200">.</span></span>}
+                  </div>
+                </motion.div>
+              ))}
+              {isTyping && !messages[messages.length-1].text && (
+                <div className="flex justify-start">
+                  <div className="bg-white/5 p-4 rounded-2xl rounded-tl-none border border-white/10">
+                    <span className="flex gap-1 text-indigo-500">
+                      <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1 }}>●</motion.span>
+                      <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }}>●</motion.span>
+                      <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }}>●</motion.span>
+                    </span>
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
+            </div>
+
+            {/* Footer Form */}
+            <div className="p-4 bg-white/5 border-t border-white/5">
+              <div className="relative">
+                <input
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                  placeholder="Ваш вопрос..."
+                  className="w-full bg-black/40 border border-white/10 rounded-xl py-4 pl-4 pr-12 text-sm text-white focus:outline-none focus:border-indigo-600 transition-all font-bold italic"
+                />
+                <button 
+                  onClick={handleSendMessage}
+                  disabled={isTyping}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-indigo-500 disabled:opacity-30 hover:scale-110 transition-all"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <Magnetic strength={0.2}>
+        <motion.button
+          onClick={() => setIsOpen(!isOpen)}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="w-16 h-16 bg-white text-black rounded-full shadow-2xl flex items-center justify-center relative group overflow-hidden"
+        >
+          <div className="absolute inset-0 bg-indigo-600 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+          <div className="relative z-10">
+            {isOpen ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="group-hover:text-white transition-colors"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            ) : (
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="group-hover:text-white transition-colors"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            )}
+          </div>
+          <motion.div 
+            animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ repeat: Infinity, duration: 2 }}
+            className="absolute inset-0 bg-indigo-500 blur-xl opacity-20 -z-10"
+          />
+        </motion.button>
+      </Magnetic>
+    </div>
+  );
+};
 
 // --- Loading Screen Component ---
 const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
@@ -550,6 +726,7 @@ const App = () => {
             <ContactSection />
           </main>
           
+          <AIChatAssistant onLeadCapture={() => setIsQuiz(true)} />
           <LeadModal isOpen={isQuiz} onClose={() => setIsQuiz(false)} />
           
           <footer className="py-16 md:py-24 px-6 md:px-8 border-t border-white/5 bg-black">

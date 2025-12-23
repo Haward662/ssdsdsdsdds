@@ -17,9 +17,9 @@ export const SERVICES: Service[] = [
     icons: [
       'https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg',
       'https://upload.wikimedia.org/wikipedia/commons/f/f3/VK_Compact_Logo_%282021-present%29.svg',
-      'https://upload.wikimedia.org/wikipedia/commons/c/c2/Odnoklassniki_Logo.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/2/22/OK_logo.svg',
       'https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg',
-      'https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg'
+      'https://www.svgrepo.com/show/333611/tiktok.svg'
     ],
   },
   {
@@ -28,8 +28,8 @@ export const SERVICES: Service[] = [
     subtitle: 'Google, Яндекс',
     description: 'Привлекаем горячих клиентов, которые ищут доставку еды прямо сейчас в поисковых системах.',
     icons: [
-      'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_\"G\"_logo.svg',
-      'https://yastatic.net/s3/home/logos/share/yandex_ru.png'
+      'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/c/c3/Yandex_logo_2021.svg'
     ],
   },
   {
@@ -40,8 +40,8 @@ export const SERVICES: Service[] = [
     icons: [
       'https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg',
       'https://upload.wikimedia.org/wikipedia/commons/f/f3/VK_Compact_Logo_%282021-present%29.svg',
-      'https://upload.wikimedia.org/wikipedia/commons/c/c2/Odnoklassniki_Logo.svg',
-      'https://my.target.com/favicon.ico'
+      'https://upload.wikimedia.org/wikipedia/commons/2/22/OK_logo.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/5/52/Mail.ru_logo_2024.svg'
     ],
   },
   {
@@ -61,9 +61,9 @@ export const SERVICES: Service[] = [
     subtitle: '2ГИС, Яндекс Карты, Google Maps',
     description: 'Доминирование в локальном поиске. Собираем всех, кто ищет еду рядом с вашим заведением.',
     icons: [
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Google_Maps_icon_%282020%29.svg/1024px-Google_Maps_icon_%282020%29.svg.png',
-      'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_\"G\"_logo.svg',
-      'https://yastatic.net/s3/home/logos/share/yandex_ru.png'
+      'https://upload.wikimedia.org/wikipedia/commons/a/aa/Google_Maps_icon_%282020%29.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg',
+      'https://upload.wikimedia.org/wikipedia/commons/c/c3/Yandex_logo_2021.svg'
     ],
   },
   {
@@ -73,7 +73,7 @@ export const SERVICES: Service[] = [
     description: 'Возвращаем клиентов и увеличиваем LTV. Работаем с вашей текущей базой для повторных заказов.',
     icons: [
       'https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg',
-      'https://www.gstatic.com/images/branding/product/2x/gmail_64dp.png'
+      'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg'
     ],
   }
 ];
