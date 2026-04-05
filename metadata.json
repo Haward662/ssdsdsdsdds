@@ -1,8 +1,0 @@
-{
-  "name": "PROBOOST Agency",
-  "description": "Premium marketing landing page for food delivery business.",
-  "requestFramePermissions": [
-    "camera",
-    "microphone"
-  ]
-}
