@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pro-boost.ru/sitemap.xml
+Disallow: /admin/
+Disallow: /.env
