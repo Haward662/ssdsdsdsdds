@@ -1,0 +1,8 @@
+{
+  "name": "Food Delivery Marketing Powerhouse",
+  "description": "A high-conversion, dark-themed agency landing page specifically tailored for food delivery businesses, featuring motion design and social-media style story reviews.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
