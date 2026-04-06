@@ -1,6 +1,7 @@
 import { Telegraf } from 'telegraf';
-import dotenv from 'dotenv';
+import cron from 'node-cron';
 import fetch from 'node-fetch';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -20,24 +21,41 @@ console.log(`   Отправляет отчёты в чат: ${CHAT_ID}\n`);
 
 // ─── /start ───────────────────────────────────────────────────────────────
 bot.command('start', (ctx) => {
-  ctx.reply(`👋 Привет! Я аналитик PROBOOST.\n\nДоступные команды:\n/report24 - отчёт за 24 часа\n/report7 - отчёт за 7 дней\n/stats - статистика\n/help - справка`);
+  ctx.reply(`👋 Привет! Я аналитик и контент-помощник PROBOOST.
+
+Доступные команды:
+
+📊 АНАЛИТИКА:
+  /report24 - отчёт за 24 часа
+  /report7 - отчёт за 7 дней
+  /stats - статистика
+
+✍️ СТАТЬИ:
+  /articles - показать черновики на одобрение
+  /ready "текст статьи" - отправить готовую статью (публикуется сразу)
+  /topic "тема статьи" - придумать статью по теме (нужно одобрение)
+
+🔔 АВТОМАТИЧЕСКОЕ:
+  Каждый день в 09:00 - генерация новой статьи
+  Каждый вечер (18:00) - отчёт об аналитике`);
 });
 
 // ─── /help ────────────────────────────────────────────────────────────────
 bot.command('help', (ctx) => {
   const help = `
-📊 Аналитика:
+📊 АНАЛИТИКА:
   /report24 - анализ за последние 24 часа
   /report7 - анализ за последние 7 дней
   /stats - быстрая статистика
 
-✍️ Статьи:
-  /idea "твоя идея статьи" - предложить идею
+✍️ СТАТЬИ (контент):
   /articles - показать черновики на одобрение
+  /ready "текст статьи" - отправить готовую статью (публикуется сразу!)
+  /topic "тема статьи" - попросить AI раскрыть тему (требует одобрения)
 
-🔔 Автоматические отчёты:
-  Каждый день в 9:00 и 18:00
-  Новые статьи в 15:00 NSK
+🤖 АВТОМАТИЧЕСКОЕ:
+  • Каждый день в 09:00 - Gemini генерирует новую статью
+  • Каждый вечер в 18:00 - отчёт об аналитике и трафике
 `;
   ctx.reply(help);
 });
@@ -91,6 +109,7 @@ ${analysis}
 ───────────────
 📈 Статистика:
   • События: ${stats?.totalEvents || 0}
+  • Просмотры: ${stats?.pageViews || 0}
   • Среднее прокручивание: ${stats?.avgScrollDepth || 0}%
 `;
 
@@ -117,35 +136,80 @@ bot.command('stats', async (ctx) => {
   }
 });
 
-// ─── /idea ────────────────────────────────────────────────────────────────
-bot.command('idea', async (ctx) => {
-  const idea = ctx.message.text.replace('/idea', '').trim();
+// ─── /ready "текст" - готовая статья (публикуется сразу) ──────────────────
+bot.command('ready', async (ctx) => {
+  const text = ctx.message.text.replace('/ready', '').trim();
 
-  if (!idea) {
-    return ctx.reply('📝 Используй: /idea "твоя идея статьи"');
+  if (!text) {
+    return ctx.reply(`📝 Используй: /ready "текст вашей статьи"`);
   }
+
+  ctx.reply('⏳ Сохраняю статью...');
 
   try {
     const response = await fetch(`${ANALYTICS_URL}/api/articles/pending`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        title: idea.substring(0, 100),
-        content: idea,
-        source: 'user_idea',
+        title: text.substring(0, 100),
+        content: text,
+        source: 'user',  // готовая статья от пользователя
+        category: 'strategy'
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      // Сразу одобряем (публикуем)
+      const approveResponse = await fetch(`${ANALYTICS_URL}/api/articles/approve/${data.id}`, {
+        method: 'POST'
+      });
+
+      if (approveResponse.ok) {
+        ctx.reply('✅ Статья опубликована! Уже на сайте!');
+        console.log(`📝 Статья опубликована сразу: ${text.substring(0, 50)}`);
+      }
+    } else {
+      ctx.reply('❌ Ошибка сохранения статьи');
+    }
+  } catch (err) {
+    ctx.reply('❌ Ошибка сохранения статьи');
+    console.error(err);
+  }
+});
+
+// ─── /topic "тема" - Gemini раскрывает тему (требует одобрения) ────────────
+bot.command('topic', async (ctx) => {
+  const topic = ctx.message.text.replace('/topic', '').trim();
+
+  if (!topic) {
+    return ctx.reply(`📝 Используй: /topic "тема для статьи"`);
+  }
+
+  ctx.reply('⏳ Генерирую статью по теме (дай 30 секунд)...');
+
+  try {
+    const response = await fetch(`${ANALYTICS_URL}/api/articles/pending`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: topic.substring(0, 100),
+        content: topic,
+        source: 'user_topic',  // тема от пользователя, нужно одобрение
         category: 'strategy'
       })
     });
 
     if (response.ok) {
-      ctx.reply('✅ Идея принята! AI будет работать над статьей. Результат отправлю в чат.');
+      ctx.reply('✅ Тема принята! Gemini работает над статьей. Результат отправлю в чат.\n\n(Будет нужно твоё одобрение - используй /articles)');
     }
   } catch (err) {
-    ctx.reply('❌ Ошибка сохранения идеи');
+    ctx.reply('❌ Ошибка сохранения темы');
   }
 });
 
-// ─── /articles ────────────────────────────────────────────────────────────
+// ─── /articles - показать черновики на одобрение ──────────────────────────
 bot.command('articles', async (ctx) => {
   try {
     const response = await fetch(`${ANALYTICS_URL}/api/articles/pending`);
@@ -158,14 +222,15 @@ bot.command('articles', async (ctx) => {
 
     for (const article of pending) {
       const preview = article.content.substring(0, 300) + '...';
+      const sourceLabel = article.source === 'auto' ? '🤖 Автогенерация' : article.source === 'user_topic' ? '✍️ Ручная тема' : '📝 Готовая статья';
 
       ctx.replyWithHTML(`
+<b>${sourceLabel}</b>
 <b>📝 ${article.title}</b>
-<i>${article.source}</i>
 
 ${preview}
 
-/approve_${article.id.replace('-', '_')} или /reject_${article.id.replace('-', '_')}
+/approve_${article._id.replace('-', '_')} или /reject_${article._id.replace('-', '_')}
       `, {
         parse_mode: 'HTML'
       });
@@ -174,34 +239,6 @@ ${preview}
     ctx.reply('❌ Ошибка загрузки статей');
   }
 });
-
-// ─── Автоматический ежедневный отчёт ──────────────────────────────────────
-setInterval(async () => {
-  const now = new Date();
-  // Отправляем отчёты в 9:00 и 18:00
-  if ((now.getHours() === 9 || now.getHours() === 18) && now.getMinutes() === 0) {
-    const { analysis, stats } = await getAnalysis(24);
-
-    const message = `
-📊 ЕЖЕДНЕВНЫЙ ОТЧЁТ (${now.toLocaleString('ru-RU')})
-
-${analysis}
-
-───────────────
-📈 Статистика:
-  • События: ${stats?.totalEvents || 0}
-  • Просмотры: ${stats?.pageViews || 0}
-  • Клики: ${stats?.articleClicks || 0}
-`;
-
-    try {
-      await bot.telegram.sendMessage(CHAT_ID, message);
-      console.log(`✅ Отправлен ежедневный отчёт в ${now.toLocaleTimeString('ru-RU')}`);
-    } catch (err) {
-      console.error('Ошибка отправки отчёта:', err.message);
-    }
-  }
-}, 60000); // Проверяем каждую минуту
 
 // ─── Обработка /approve и /reject ─────────────────────────────────────────
 bot.hears(/^\/approve_.+/, async (ctx) => {
@@ -213,7 +250,7 @@ bot.hears(/^\/approve_.+/, async (ctx) => {
     });
 
     if (response.ok) {
-      ctx.reply('✅ Статья одобрена! Добавляю на сайт...');
+      ctx.reply('✅ Статья одобрена! Она на сайте!');
     } else {
       ctx.reply('❌ Статья не найдена');
     }
@@ -231,12 +268,75 @@ bot.hears(/^\/reject_.+/, async (ctx) => {
     });
 
     if (response.ok) {
-      ctx.reply('❌ Статья отклонена');
+      ctx.reply('❌ Статья удалена');
     } else {
       ctx.reply('❌ Статья не найдена');
     }
   } catch (err) {
     ctx.reply('❌ Ошибка отклонения');
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ─── РАСПИСАНИЕ (CRON) ─────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ─── 09:00 ежедневно - автоматическое создание статьи ─────────────────────
+cron.schedule('0 9 * * *', async () => {
+  console.log('🤖 [CRON 09:00] Запускаю генерацию статьи...');
+
+  try {
+    const generateResponse = await fetch(`${ANALYTICS_URL}/api/articles/generate`);
+    const { article } = await generateResponse.json();
+
+    if (article) {
+      const preview = article.content.substring(0, 300) + '...';
+
+      // Отправляем в Telegram
+      await bot.telegram.sendMessage(CHAT_ID, `
+🤖 АВТОМАТИЧЕСКАЯ СТАТЬЯ (${new Date().toLocaleString('ru-RU')})
+
+<b>${article.title}</b>
+
+${preview}
+
+/approve_${article.id.replace('-', '_')} или /reject_${article.id.replace('-', '_')}
+      `, { parse_mode: 'HTML' });
+
+      console.log(`✅ [CRON 09:00] Статья сгенерирована и отправлена`);
+    }
+  } catch (err) {
+    console.error('❌ [CRON 09:00] Ошибка генерации статьи:', err.message);
+  }
+});
+
+// ─── 18:00 ежедневно - ежевечерний отчёт аналитики ────────────────────────
+cron.schedule('0 18 * * *', async () => {
+  console.log('📊 [CRON 18:00] Запускаю отправку вечернего отчёта...');
+
+  try {
+    const { analysis, stats } = await getAnalysis(24);
+
+    const message = `
+📊 ВЕЧЕРНИЙ ОТЧЁТ (${new Date().toLocaleString('ru-RU')})
+
+${analysis}
+
+───────────────
+📈 За сегодня:
+  • События: ${stats?.totalEvents || 0}
+  • Просмотры: ${stats?.pageViews || 0}
+  • Клики: ${stats?.articleClicks || 0}
+  • Прокрутка: ${stats?.avgScrollDepth || 0}%
+
+🔝 ТОП 3 статьи:
+${stats?.topArticles?.slice(0, 3).map((a, i) => `  ${i+1}. ${a}`).join('\n') || '  Нет данных'}
+    `;
+
+    await bot.telegram.sendMessage(CHAT_ID, message);
+    console.log(`✅ [CRON 18:00] Вечерний отчёт отправлен`);
+  } catch (err) {
+    console.error('❌ [CRON 18:00] Ошибка отправки отчёта:', err.message);
   }
 });
 

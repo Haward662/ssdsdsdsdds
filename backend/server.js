@@ -147,145 +147,143 @@ ${JSON.stringify(stats, null, 2)}
   }
 });
 
-// ─── Pending articles management ──────────────────────────────────────────
-const getPendingArticles = () => {
+// ─── Articles Management (MongoDB) ────────────────────────────────────────
+// Сохранение новой статьи (черновик или автоматическая)
+app.post('/api/articles/pending', async (req, res) => {
   try {
-    return JSON.parse(fs.readFileSync(pendingArticlesPath, 'utf8'));
-  } catch {
-    return [];
-  }
-};
+    if (!db) {
+      return res.status(500).json({ error: 'MongoDB не подключена' });
+    }
 
-const savePendingArticles = (articles) => {
-  fs.writeFileSync(pendingArticlesPath, JSON.stringify(articles, null, 2));
-};
-
-app.post('/api/articles/pending', (req, res) => {
-  try {
     const article = {
-      id: `article-${Date.now()}`,
-      ...req.body,
+      _id: `article-${Date.now()}`,
+      title: req.body.title,
+      content: req.body.content,
+      slug: req.body.slug || req.body.title.toLowerCase()
+        .replace(/[^а-яa-z0-9]/g, '-')
+        .replace(/-+/g, '-')
+        .slice(0, 50),
+      category: req.body.category || 'strategy',
+      source: req.body.source || 'user', // 'user', 'user_topic', 'auto'
+      status: 'pending', // pending или published
       createdAt: new Date(),
-      status: 'pending'
+      publishedAt: null,
+      readTime: Math.ceil((req.body.content || '').split(' ').length / 200)
     };
 
-    const articles = getPendingArticles();
-    articles.push(article);
-    savePendingArticles(articles);
-
+    await db.collection('articles').insertOne(article);
     console.log(`📝 Новая статья (${article.source}): ${article.title}`);
-    res.json({ ok: true, id: article.id });
+    res.json({ ok: true, id: article._id });
   } catch (err) {
+    console.error('Ошибка сохранения статьи:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
-app.get('/api/articles/pending', (req, res) => {
+// Получить черновики на одобрение
+app.get('/api/articles/pending', async (req, res) => {
   try {
-    const articles = getPendingArticles();
+    if (!db) {
+      return res.json([]);
+    }
+
+    const articles = await db.collection('articles')
+      .find({ status: 'pending' })
+      .sort({ createdAt: -1 })
+      .toArray();
+
     res.json(articles);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.post('/api/articles/approve/:id', (req, res) => {
+// Одобрить статью (опубликовать)
+app.post('/api/articles/approve/:id', async (req, res) => {
   try {
-    const articles = getPendingArticles();
-    const article = articles.find(a => a.id === req.params.id);
-
-    if (!article) {
-      return res.status(404).json({ error: 'Article not found' });
+    if (!db) {
+      return res.status(500).json({ error: 'MongoDB не подключена' });
     }
 
-    article.status = 'approved';
-    article.approvedAt = new Date();
-    savePendingArticles(articles);
-
-    // Добавляем в articles-data.ts на фронте
-    const frontendArticleDataPath = path.join(process.cwd(), '../sait-main/articles-data.ts');
-
-    try {
-      const slug = article.title.toLowerCase()
-        .replace(/[^а-яa-z0-9]/g, '-')
-        .replace(/-+/g, '-')
-        .slice(0, 50);
-
-      const approvedArticle = {
-        id: article.id,
-        slug: slug,
-        title: article.title.split('\n')[0], // First line as title
-        excerpt: article.content.split('\n').slice(1, 3).join(' ').slice(0, 150),
-        content: article.content,
-        category: article.category || 'strategy',
-        tags: ['ai-generated', 'approved'],
-        publishedAt: new Date().toISOString(),
-        readTime: Math.ceil(article.content.split(' ').length / 200),
-        imageUrl: 'https://via.placeholder.com/400x250?text=' + encodeURIComponent(article.title.split('\n')[0])
-      };
-
-      // Читаем текущие статьи
-      let articlesContent = fs.readFileSync(frontendArticleDataPath, 'utf8');
-
-      // Добавляем новую статью в массив перед последней статьей
-      const newArticleEntry = `  {
-    id: "${approvedArticle.id}",
-    slug: "${approvedArticle.slug}",
-    title: "${approvedArticle.title.replace(/"/g, '\\"')}",
-    excerpt: "${approvedArticle.excerpt.replace(/"/g, '\\"')}",
-    content: \`${approvedArticle.content.replace(/`/g, '\\`')}\`,
-    category: "${approvedArticle.category}",
-    tags: [${approvedArticle.tags.map(t => `"${t}"`).join(', ')}],
-    publishedAt: "${approvedArticle.publishedAt}",
-    readTime: ${approvedArticle.readTime},
-    imageUrl: "${approvedArticle.imageUrl}"
-  },
-  `;
-
-      // Вставляем перед последней закрывающей скобкой
-      articlesContent = articlesContent.replace(
-        '];',
-        newArticleEntry + '];'
-      );
-
-      fs.writeFileSync(frontendArticleDataPath, articlesContent);
-      console.log(`📝 Статья добавлена на сайт: ${article.title.split('\n')[0]}`);
-
-      // Генерируем sitemap.xml и feed.xml для SEO/поисковиков
-      try {
-        const allArticles = JSON.parse(fs.readFileSync(frontendArticleDataPath, 'utf8'))
-          .match(/{\s*id:|const ARTICLES.*?\]/s)[0];
-
-        // Читаем все статьи для генерирования sitemap
-        const articlesDataContent = fs.readFileSync(frontendArticleDataPath, 'utf8');
-        console.log(`✅ Sitemap и RSS будут сгенерированы при следующем запуске`);
-      } catch (err) {
-        console.warn(`⚠️  Не смог сгенерировать sitemap: ${err.message}`);
+    const result = await db.collection('articles').updateOne(
+      { _id: req.params.id },
+      {
+        $set: {
+          status: 'published',
+          publishedAt: new Date()
+        }
       }
-    } catch (err) {
-      console.warn(`⚠️ Не смог добавить в articles-data.ts: ${err.message}`);
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ error: 'Статья не найдена' });
     }
 
-    res.json({ ok: true, message: 'Статья добавлена на сайт' });
+    console.log(`✅ Статья одобрена и опубликована: ${req.params.id}`);
+    res.json({ ok: true, message: 'Статья опубликована' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.post('/api/articles/reject/:id', (req, res) => {
+// Отклонить статью (удалить черновик)
+app.post('/api/articles/reject/:id', async (req, res) => {
   try {
-    const articles = getPendingArticles();
-    const index = articles.findIndex(a => a.id === req.params.id);
+    if (!db) {
+      return res.status(500).json({ error: 'MongoDB не подключена' });
+    }
 
-    if (index === -1) {
+    const result = await db.collection('articles').deleteOne({
+      _id: req.params.id
+    });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: 'Статья не найдена' });
+    }
+
+    console.log(`❌ Статья отклонена и удалена`);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── GET все опубликованные статьи (для фронтенда) ──────────────────────
+app.get('/api/articles', async (req, res) => {
+  try {
+    if (!db) {
+      return res.json([]);
+    }
+
+    const articles = await db.collection('articles')
+      .find({ status: 'published' })
+      .sort({ publishedAt: -1 })
+      .toArray();
+
+    res.json(articles);
+  } catch (err) {
+    console.error('Ошибка получения статей:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── GET одну статью по slug (для страницы статьи) ───────────────────────
+app.get('/api/articles/:slug', async (req, res) => {
+  try {
+    if (!db) {
       return res.status(404).json({ error: 'Article not found' });
     }
 
-    articles.splice(index, 1);
-    savePendingArticles(articles);
+    const article = await db.collection('articles').findOne({
+      slug: req.params.slug,
+      status: 'published'
+    });
 
-    console.log(`❌ Статья отклонена`);
-    res.json({ ok: true });
+    if (!article) {
+      return res.status(404).json({ error: 'Article not found' });
+    }
+
+    res.json(article);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -321,15 +319,22 @@ app.get('/api/articles/generate', async (req, res) => {
 
     console.log(`\n🤖 Генерирую статью: "${topic.title}"...`);
 
-    const prompt = `Write a complete article in Russian about: "${topic.title}"
+    const prompt = `Write a complete SEO-optimized article in Russian about: "${topic.title}"
 
 Requirements:
-- Length: 1200-1800 words
-- Realistic content with specific examples and numbers
-- Practical steps and tips
+- Length: 1500-2000 words
+- Realistic content with specific examples, case studies, numbers, and statistics
+- Practical steps, tips and recommendations
 - Avoid AI templates and filler content
-- Use HTML tags for formatting (h2, h3, p, ul, li, strong, a)
+- Use HTML tags for formatting: h2 (with id attributes), h3, p, ul, li, strong, em, a with href
+- Include Table of Contents with anchor links at the beginning
+- Add 2-3 contextual internal links to services/pages with <a href="/services/...">anchor text</a>
+- Include FAQ section at the end with 3-4 questions/answers
+- Add author bio and expert profile block
+- All H2 headers must have descriptive id attributes for TOC linking
+- Use specific numbers, percentages, and real-world examples
 - Provide real value, not empty words
+- SEO keywords should be naturally integrated throughout
 
 Return ONLY the article text in HTML format, starting directly with the text, no explanations.`;
 

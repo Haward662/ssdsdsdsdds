@@ -654,7 +654,27 @@ const App = () => {
   const [isQuiz, setIsQuiz] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hash, setHash] = useState(() => window.location.hash);
-  const articles = articlesData;
+  const [articles, setArticles] = useState<Article[]>(articlesData); // Default to static articles
+
+  // Загружаем статьи с API при загрузке компонента
+  useEffect(() => {
+    const loadArticles = async () => {
+      try {
+        const response = await fetch(`${ANALYTICS_URL}/api/articles`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.length > 0) {
+            setArticles(data);
+            console.log(`✅ Загружено ${data.length} статей с API`);
+          }
+        }
+      } catch (err) {
+        console.warn('⚠️ Не смог загрузить статьи с API, используем локальные:', err.message);
+        // Fallback to static articles
+      }
+    };
+    loadArticles();
+  }, []);
 
   // Analytics tracking
   const USER_ID = useMemo(() => {
