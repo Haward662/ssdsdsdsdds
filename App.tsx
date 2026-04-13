@@ -531,8 +531,8 @@ const ArticlePage = ({ article, onBack, trackEvent }: { article: Article; onBack
 };
 
 // --- Blog List Page ---
-const BlogPage = ({ onArticle, trackEvent }: { onArticle: (slug: string) => void; trackEvent: (name: string, data?: any) => void }) => {
-  const sorted = [...articlesData].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+const BlogPage = ({ articles, onArticle, trackEvent }: { articles: Article[]; onArticle: (slug: string) => void; trackEvent: (name: string, data?: any) => void }) => {
+  const sorted = [...articles].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
   const [filter, setFilter] = useState<string>('Все');
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
@@ -820,7 +820,7 @@ const App = () => {
               {currentArticle ? (
                 <ArticlePage article={currentArticle} onBack={() => goTo('#/blog')} trackEvent={trackEvent} />
               ) : (
-                <BlogPage onArticle={(slug) => goTo(`#/blog/${slug}`)} trackEvent={trackEvent} />
+                <BlogPage articles={articles} onArticle={(slug) => goTo(`#/blog/${slug}`)} trackEvent={trackEvent} />
               )}
               {footer}
             </>
