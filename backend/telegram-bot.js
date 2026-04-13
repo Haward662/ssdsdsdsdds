@@ -314,6 +314,10 @@ bot.on('text', async (ctx) => {
     }
 
     ctx.session = {};
+  } else {
+    // Если текст пришел без режима - показать главное меню
+    console.log(`📨 Получено сообщение без режима: "${ctx.message.text.substring(0, 50)}"`);
+    ctx.reply('Используй кнопки ниже 👇', mainMenu);
   }
 });
 

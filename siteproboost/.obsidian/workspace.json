@@ -1,0 +1,253 @@
+{
+  "main": {
+    "id": "797c72d2eb5bcd56",
+    "type": "split",
+    "children": [
+      {
+        "id": "10fe3301a020d58d",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "8d0be7b08caf6219",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "05_VK_Max_и_NeuroAPI_Нюансы.md.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "05_VK_Max_и_NeuroAPI_Нюансы.md"
+            }
+          },
+          {
+            "id": "2b42480bacdcb9a1",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "06_NeuroAPI.md.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "06_NeuroAPI.md"
+            }
+          },
+          {
+            "id": "92551049d02fb6dd",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "памятка_по_деплою.md.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "памятка_по_деплою.md"
+            }
+          }
+        ],
+        "currentTab": 2
+      },
+      {
+        "id": "44fe9051a44884d7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6b34cba8b11c83ff",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "README.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "README"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "eac2967b1b469d41",
+    "type": "split",
+    "children": [
+      {
+        "id": "dc7d9e34859bd62a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "bf18e251abec5801",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Файловый менеджер"
+            }
+          },
+          {
+            "id": "e1fe4d3bc97aa9d2",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Поиск"
+            }
+          },
+          {
+            "id": "e0f03ed3ecd6bcce",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Закладки"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "40c5e8b1926bfe22",
+    "type": "split",
+    "children": [
+      {
+        "id": "dd1666cf74d24294",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "32c1258961bbd916",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "памятка_по_деплою.md.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Обратные ссылки для памятка_по_деплою.md"
+            }
+          },
+          {
+            "id": "f6152e6c76c8b623",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "памятка_по_деплою.md.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Исходящие ссылки из памятка_по_деплою.md"
+            }
+          },
+          {
+            "id": "a45c18c0d4607aff",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Теги"
+            }
+          },
+          {
+            "id": "d5500b3628d5a29e",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Все свойства"
+            }
+          },
+          {
+            "id": "e3cb504be3724f7f",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "памятка_по_деплою.md.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Структура памятка_по_деплою.md"
+            }
+          }
+        ],
+        "currentTab": 4
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Меню быстрого перехода": false,
+      "graph:Граф": false,
+      "canvas:Создать новый холст": false,
+      "daily-notes:Сегодняшняя заметка": false,
+      "templates:Вставить шаблон": false,
+      "command-palette:Открыть палитру команд": false,
+      "bases:Создать новую базу": false
+    }
+  },
+  "active": "92551049d02fb6dd",
+  "lastOpenFiles": [
+    "README.md",
+    "README 1.md",
+    "памятка_по_деплою.md.md",
+    "ссылка документация макс.md",
+    "DEPLOY_GUIDE.md",
+    "ARCHITECTURE.md",
+    "project_documentation.md",
+    "06_NeuroAPI.md.md",
+    "05_VK_Max_и_NeuroAPI_Нюансы.md.md",
+    "04_Интеграция_Max.md.md",
+    "02_База_Данных_Схема.md.md",
+    "03_Золотой_Промпт_SEO.md.md",
+    "01_Архитектура_Проекта.md.md",
+    "Добро пожаловать.md"
+  ]
+}
