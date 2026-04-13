@@ -43,7 +43,18 @@ app.get('/api/articles', async (req, res) => {
       .find({ status: 'published' })
       .sort({ publishedAt: -1 })
       .toArray();
-    res.json(articles);
+      
+    const mapped = articles.map(a => ({
+      ...a,
+      id: a._id,
+      category: a.category || a.niche || 'Статьи',
+      excerpt: a.excerpt || (a.content ? a.content.replace(/[#*`>_~]/g, '').replace(/\n+/g, ' ').substring(0, 150) + '...' : ''),
+      imageUrl: a.imageUrl || 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800&h=450',
+      readTime: a.readTime || (a.content ? Math.ceil(a.content.split(' ').length / 200) : 5),
+      tags: a.tags || []
+    }));
+    
+    res.json(mapped);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
