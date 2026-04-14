@@ -44,15 +44,25 @@ app.get('/api/articles', async (req, res) => {
       .sort({ publishedAt: -1 })
       .toArray();
       
-    const mapped = articles.map(a => ({
-      ...a,
-      id: a._id,
-      category: a.category || a.niche || 'Статьи',
-      excerpt: a.excerpt || (a.content ? a.content.replace(/[#*`>_~]/g, '').replace(/\n+/g, ' ').substring(0, 150) + '...' : ''),
-      imageUrl: a.imageUrl || 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800&h=450',
-      readTime: a.readTime || (a.content ? Math.ceil(a.content.split(' ').length / 200) : 5),
-      tags: a.tags || []
-    }));
+    const mapped = articles.map(a => {
+      let htmlContent = a.content || '';
+      
+      // Если это старый Plaintext (без HTML тегов), оборачиваем абзацы в теги
+      if (!htmlContent.includes('<p>') && !htmlContent.includes('<h2>') && htmlContent.length > 0) {
+        htmlContent = htmlContent.split(/\n\n+/).map(para => `<p>${para.replace(/\n/g, '<br/>')}</p>`).join('');
+      }
+
+      return {
+        ...a,
+        id: a._id,
+        content: htmlContent,
+        category: a.category || a.niche || 'Статьи',
+        excerpt: a.excerpt || (a.content ? a.content.replace(/[#*`>_~<]/g, '').replace(/\n+/g, ' ').substring(0, 150) + '...' : ''),
+        imageUrl: a.imageUrl || 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800&h=450',
+        readTime: a.readTime || (a.content ? Math.ceil(a.content.split(' ').length / 200) : 5),
+        tags: a.tags || []
+      };
+    });
     
     res.json(mapped);
   } catch (err) {
@@ -206,14 +216,17 @@ bot.on('message_created', async (ctx) => {
     if (userState[userId] === 'waiting_ready_text') {
       delete userState[userId];
       try {
-        const title = text.substring(0, 100).replace(/[\n\r]/g, ' ');
+        const lines = text.trim().split('\n');
+        const title = lines[0].substring(0, 100).replace(/[\n\r]/g, ' ');
+        const htmlContent = text.split(/\n\n+/).map(p => `<p>${p.replace(/\n/g, '<br/>')}</p>`).join('');
+
         const draft = {
           _id: `upload-${Date.now()}`,
           title,
           niche: 'Пользовательский контент',
           topic: title,
-          content: text,
-          slug: title.toLowerCase().replace(/[^a-zа-яё0-9]/gi, '-').substring(0, 80),
+          content: htmlContent,
+          slug: title.toLowerCase().replace(/[^a-zа-яё0-9]/gi, '-').substring(0, 80) || `upload-${Date.now()}`,
           source: 'user_upload',
           status: 'draft',
           createdAt: new Date(),
