@@ -197,6 +197,15 @@ bot.action(/^reject_(.+)$/, async (ctx) => {
   await rejectDraft(ctx, draftId);
 });
 
+bot.action('menu_admin', async (ctx) => {
+  await showAdminPanel(ctx);
+});
+
+bot.action(/^delete_(.+)$/, async (ctx) => {
+  const articleId = ctx.match[1];
+  await deleteArticle(ctx, articleId);
+});
+
 // ─── Обработка кнопок и сообщений ─────────────
 
 bot.on('message_created', async (ctx) => {

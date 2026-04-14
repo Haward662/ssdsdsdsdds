@@ -649,6 +649,69 @@ const updateMetaTags = (title: string, description: string, imageUrl: string, ur
   canonical.setAttribute('href', url);
 };
 
+// --- Cookie Consent & Analytics ---
+const CookieConsent = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const consent = localStorage.getItem('cookieConsent');
+    if (!consent) {
+      setTimeout(() => setIsVisible(true), 1500); // Показываем с задержкой
+    } else {
+      initAnalytics();
+    }
+  }, []);
+
+  const initAnalytics = () => {
+    // @ts-ignore
+    if (window.ym) return;
+    // @ts-ignore
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+    // @ts-ignore
+    m[i].l=1*new Date();
+    for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+    // @ts-ignore
+    k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+    (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+    // @ts-ignore
+    window.ym(99999999, "init", { // TODO: ЗАМЕНИТЬ НА ВАШ СЧЕТЧИК
+         clickmap:true,
+         trackLinks:true,
+         accurateTrackBounce:true,
+         webvisor:true // ВАЖНО: Включает вебвизор для поведенческих факторов
+    });
+  };
+
+  const handleAccept = () => {
+    localStorage.setItem('cookieConsent', 'true');
+    setIsVisible(false);
+    initAnalytics();
+  };
+
+  if (!isVisible) return null;
+
+  return (
+    <motion.div
+      initial={{ y: 100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      className="fixed bottom-0 left-0 right-0 z-[9999] p-4 md:p-6 bg-black/95 backdrop-blur-xl border-t border-white/10 shadow-[0_-20px_50px_rgba(0,0,0,0.5)]"
+    >
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="text-xs md:text-sm text-white/60 flex-1 leading-relaxed">
+          <strong className="text-white">Мы используем файлы cookie.</strong> Это необходимо для сбора аналитики, записи поведенческих факторов (через Вебвизор) и корректной работы рекламных пикселей для ретаргетинга. Находясь на сайте, вы даете согласие на обработку данных.
+        </div>
+        <button
+          onClick={handleAccept}
+          className="w-full md:w-auto px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black uppercase tracking-[0.2em] rounded-full transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]"
+        >
+          Принять
+        </button>
+      </div>
+    </motion.div>
+  );
+};
+
 // --- App Root ---
 const App = () => {
   const [isQuiz, setIsQuiz] = useState(false);
@@ -809,6 +872,8 @@ const App = () => {
       <AnimatePresence>
         {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} />}
       </AnimatePresence>
+
+      <CookieConsent />
 
       {!isLoading && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
