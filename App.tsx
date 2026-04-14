@@ -125,6 +125,32 @@ const Magnetic = ({ children, strength = 0.35 }: { children: React.ReactNode, st
 
 // --- Lead Modal ---
 const LeadModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  const [name, setName] = useState('');
+  const [contact, setContact] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('loading');
+    try {
+      await fetch(`${ANALYTICS_URL}/api/leads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, contact })
+      });
+      setStatus('success');
+      setTimeout(() => {
+        onClose();
+        setStatus('idle');
+        setName('');
+        setContact('');
+      }, 2000);
+    } catch (err) {
+      console.error(err);
+      setStatus('error');
+    }
+  };
+
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/95 backdrop-blur-3xl">
@@ -133,10 +159,12 @@ const LeadModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
         <h2 className="text-3xl md:text-5xl font-black text-white uppercase italic mb-8 leading-none">ОБСУДИТЬ<br/><span className="text-indigo-500">ПРОЕКТ</span></h2>
-        <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); onClose(); }}>
-          <input required placeholder="ВАШЕ ИМЯ" className="w-full bg-transparent border-b-2 border-white/10 py-4 md:py-5 text-lg md:text-xl font-bold focus:border-indigo-600 outline-none transition-all text-white" />
-          <input required placeholder="TELEGRAM / WHATSAPP" className="w-full bg-transparent border-b-2 border-white/10 py-4 md:py-5 text-lg md:text-xl font-bold focus:border-indigo-600 outline-none transition-all text-white" />
-          <button className="w-full py-6 md:py-8 bg-white text-black font-black text-lg md:text-xl rounded-2xl hover:bg-indigo-600 hover:text-white transition-all uppercase italic">ОТПРАВИТЬ ЗАЯВКУ</button>
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          <input required placeholder="ВАШЕ ИМЯ" value={name} onChange={e => setName(e.target.value)} className="w-full bg-transparent border-b-2 border-white/10 py-4 md:py-5 text-lg md:text-xl font-bold focus:border-indigo-600 outline-none transition-all text-white" />
+          <input required placeholder="TELEGRAM / WHATSAPP" value={contact} onChange={e => setContact(e.target.value)} className="w-full bg-transparent border-b-2 border-white/10 py-4 md:py-5 text-lg md:text-xl font-bold focus:border-indigo-600 outline-none transition-all text-white" />
+          <button disabled={status === 'loading' || status === 'success'} className="w-full py-6 md:py-8 bg-white text-black font-black text-lg md:text-xl rounded-2xl hover:bg-indigo-600 hover:text-white transition-all uppercase italic disabled:opacity-50">
+            {status === 'loading' ? 'ОТПРАВКА...' : status === 'success' ? 'ЗАЯВКА ОТПРАВЛЕНА!' : 'ОТПРАВИТЬ ЗАЯВКУ'}
+          </button>
         </form>
       </motion.div>
     </div>
