@@ -36,7 +36,7 @@ export async function generateArticle(niche, topic) {
     console.log(`🤖 Отправляю запрос в Gemini: "${niche}" -> "${topic}"`);
 
     const response = await getClient().chat.completions.create({
-      model: 'gemini-2.0-flash',
+      model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: `Ниша: ${niche}\nТема: ${topic}` }
@@ -59,13 +59,12 @@ export async function rewriteArticle(originalContent) {
     console.log('🔄 Переписываю статью через Gemini...');
 
     const response = await getClient().chat.completions.create({
-      model: 'gemini-2.0-flash',
+      model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: `Переписать эту статью, следуя всем правилам:\n\n${originalContent}` }
       ],
-      temperature: 0.7,
-      max_tokens: 3000
+      temperature: 0.7
     });
 
     const rewritten = response.choices[0].message.content;
