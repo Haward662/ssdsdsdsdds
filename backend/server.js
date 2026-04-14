@@ -166,6 +166,9 @@ function approveButtons(draftId) {
       Keyboard.button.callback('❌ Отклонить', `reject_${draftId}`)
     ],
     [
+      Keyboard.button.callback('📸 Изменить картинку', `image_${draftId}`)
+    ],
+    [
       Keyboard.button.callback('📋 Все черновики', 'menu_drafts')
     ]
   ]));
@@ -276,6 +279,13 @@ bot.action(/^delete_(.+)$/, async (ctx) => {
   await deleteArticle(ctx, articleId);
 });
 
+bot.action(/^image_(.+)$/, async (ctx) => {
+  const draftId = ctx.match[1];
+  const userId = ctx.query?.sender?.user_id || ctx.query?.sender?.userId || ctx.sender?.userId || 'unknown';
+  userState[userId] = `waiting_image_${draftId}`;
+  await ctx.reply('🖼 Отправьте ссылку на картинку (начинается с http/https).\n\n*Вы можете просто скопировать URL любой картинки в браузере и отправить сюда.*', { parse_mode: 'Markdown' });
+});
+
 // ─── Обработка кнопок и сообщений ─────────────
 
 bot.on('message_created', async (ctx) => {
@@ -290,7 +300,27 @@ bot.on('message_created', async (ctx) => {
 
     console.log(`📬 [${userId}]: "${text}" | state=${JSON.stringify(userState[userId])} | allStates=${JSON.stringify(Object.keys(userState))}`);
 
-    if (!text) return;
+    if (!text && !(ctx.message?.parts)) return;
+
+    // ─ Состояние: ожидаем картинку ─
+    if (userState[userId] && userState[userId].startsWith('waiting_image_')) {
+      const draftId = userState[userId].replace('waiting_image_', '');
+      let imgUrl = null;
+
+      if (text && text.startsWith('http')) {
+        imgUrl = text;
+      }
+
+      if (imgUrl) {
+         await db.collection('articles').updateOne({ _id: draftId }, { $set: { imageUrl: imgUrl } });
+         await ctx.reply('✅ Картинка успешно обновлена!');
+         delete userState[userId];
+         await ctx.reply('Выбери действие:', MAIN_MENU);
+      } else {
+         await ctx.reply('❌ Не удалось распознать ссылку. Отправьте ссылку, начинающуюся с http/https.');
+      }
+      return;
+    }
 
     // ─ Состояние: ожидаем готовый текст (прямая загрузка без NeuroAPI)
     if (userState[userId] === 'waiting_ready_text') {
