@@ -109,15 +109,16 @@ const userState = {};
 
 const MAIN_KEYBOARD = Keyboard.inlineKeyboard([
   [
-    Keyboard.button.callback('🚀 Генерировать сейчас', 'menu_generate'),
+    Keyboard.button.callback('🚀 Генерировать', 'menu_generate'),
     Keyboard.button.callback('📋 Черновики', 'menu_drafts')
   ],
   [
-    Keyboard.button.callback('✅ Опубликовать на сайт', 'menu_publish'),
+    Keyboard.button.callback('✅ Опубликовать', 'menu_publish'),
     Keyboard.button.callback('⏱ Расписание', 'menu_schedule')
   ],
   [
-    Keyboard.button.callback('📥 Загрузить готовый текст', 'menu_upload')
+    Keyboard.button.callback('📥 Загрузить текст', 'menu_upload'),
+    Keyboard.button.callback('🛠 Админ-панель', 'menu_admin')
   ]
 ]);
 
@@ -306,6 +307,18 @@ bot.on('message_created', async (ctx) => {
       return;
     }
 
+    // ─ Кнопка: Админ-панель
+    if (text === 'menu_admin') {
+      await showAdminPanel(ctx);
+      return;
+    }
+
+    // ─ Кнопка: Удалить (из админки)
+    if (text.startsWith('delete_')) {
+      await deleteArticle(ctx, text.replace('delete_', ''));
+      return;
+    }
+
     // ─ Команда изменения расписания
     if (text.toLowerCase().startsWith('расписание ')) {
       const time = text.split(' ')[1];
@@ -469,6 +482,57 @@ async function rejectDraft(ctx, draftId) {
     await db.collection('articles').deleteOne({ _id: draftId });
     console.log(`🗑️ Удалено: ${draftId}`);
     await ctx.reply('🗑️ Черновик удалён.', MAIN_MENU);
+  } catch (err) {
+    console.error('❌ Ошибка удаления:', err.message);
+    await ctx.reply('❌ Ошибка удаления', MAIN_MENU);
+  }
+}
+
+// ─── Админ Панель ──────────────────────────────
+
+async function showAdminPanel(ctx) {
+  try {
+    const articles = await db.collection('articles')
+      .find({})
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .toArray();
+
+    if (articles.length === 0) {
+      await ctx.reply('📭 База данных пуста.', MAIN_MENU);
+      return;
+    }
+
+    let text = `🛠 Админ-панель (Последние 10 статей):\n\n`;
+    articles.forEach((a, i) => {
+      const status = a.status === 'published' ? '🟢 Опубл' : '🟡 Черновик';
+      text += `${i + 1}. [${status}] ${a.title}\n`;
+    });
+
+    const keyboard = Keyboard.inlineKeyboard([
+      ...articles.map(a => [
+        Keyboard.button.callback(`🗑 Удалить: ${a.title.substring(0, 20)}...`, `delete_${a._id}`)
+      ]),
+      [Keyboard.button.callback('← В главное меню', 'menu_main')]
+    ]);
+
+    await ctx.reply(text, withKeyboard(keyboard));
+
+  } catch (err) {
+    console.error('❌ Ошибка админ-панели:', err.message);
+    await ctx.reply('❌ Ошибка загрузки панели', MAIN_MENU);
+  }
+}
+
+async function deleteArticle(ctx, articleId) {
+  try {
+    const result = await db.collection('articles').deleteOne({ _id: articleId });
+    if (result.deletedCount > 0) {
+      console.log(`🗑️ Статья удалена из админки: ${articleId}`);
+      await ctx.reply(`🗑️ Статья успешно удалена!`, MAIN_MENU);
+    } else {
+      await ctx.reply(`❌ Статья не найдена.`, MAIN_MENU);
+    }
   } catch (err) {
     console.error('❌ Ошибка удаления:', err.message);
     await ctx.reply('❌ Ошибка удаления', MAIN_MENU);
