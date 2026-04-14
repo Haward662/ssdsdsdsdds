@@ -678,7 +678,7 @@ const updateMetaTags = (title: string, description: string, imageUrl: string, ur
 };
 
 // --- Cookie Consent & Analytics ---
-const CookieConsent = () => {
+const CookieConsent = ({ onAccept }: { onAccept?: () => void }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -715,6 +715,7 @@ const CookieConsent = () => {
     localStorage.setItem('cookieConsent', 'true');
     setIsVisible(false);
     initAnalytics();
+    if (onAccept) onAccept();
   };
 
   if (!isVisible) return null;
@@ -901,7 +902,7 @@ const App = () => {
         {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} />}
       </AnimatePresence>
 
-      <CookieConsent />
+      <CookieConsent onAccept={() => trackEvent('cookie_accepted')} />
 
       {!isLoading && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>

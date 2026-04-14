@@ -106,6 +106,20 @@ app.post('/api/leads', async (req, res) => {
   }
 });
 
+app.post('/api/analytics', async (req, res) => {
+  try {
+    const payload = {
+      ...req.body,
+      createdAt: new Date(),
+      ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    };
+    await db.collection('analytics').insertOne(payload);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/health', (req, res) => res.json({ status: 'ok', time: new Date() }));
 
 app.listen(PORT, () => console.log(`🚀 Express на порту ${PORT}`));
@@ -220,14 +234,28 @@ bot.action('menu_admin', async (ctx) => {
 
 bot.action('menu_analytics', async (ctx) => {
   try {
+    // Лиды
     const leadsCount = await db.collection('leads').countDocuments();
-    const leads = await db.collection('leads').find().sort({ createdAt: -1 }).limit(20).toArray();
+    const leads = await db.collection('leads').find().sort({ createdAt: -1 }).limit(10).toArray();
+
+    // Общая аналитика (из trackEvent)
+    const uniqueUsers = (await db.collection('analytics').distinct('userId')).length;
+    const pageViews = await db.collection('analytics').countDocuments({ event: 'page_view' });
+    const ctaClicks = await db.collection('analytics').countDocuments({ event: 'cta_click' });
+    const cookieAccepts = await db.collection('analytics').countDocuments({ event: 'cookie_accepted' });
     
     let msg = `📊 *Аналитика проекта*\n\n`;
-    msg += `Всего заявок с сайта: *${leadsCount}*\n\n`;
+    msg += `👥 *Трафик и Поведение:*\n`;
+    msg += `Уникальных посетителей: *${uniqueUsers}*\n`;
+    msg += `Просмотров страниц: *${pageViews}*\n`;
+    msg += `Нажатий "Начать рост": *${ctaClicks}*\n`;
+    msg += `Приняли Соглашение/Cookie: *${cookieAccepts}*\n\n`;
+    
+    msg += `🔥 *Воронка продаж (Лиды):*\n`;
+    msg += `Всего оставлено заявок: *${leadsCount}*\n\n`;
     
     if (leads.length > 0) {
-      msg += `👥 *Последние заявки:*\n`;
+      msg += `📞 *Последние 10 заявок:*\n`;
       leads.forEach((l, i) => {
         const date = l.createdAt ? new Date(l.createdAt).toLocaleDateString('ru-RU') : 'Недавно';
         msg += `${i+1}. ${l.name} — ${l.contact} (${date})\n`;
