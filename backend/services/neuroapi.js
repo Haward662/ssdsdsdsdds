@@ -36,13 +36,12 @@ export async function generateArticle(niche, topic) {
     console.log(`🤖 Отправляю запрос в Gemini: "${niche}" -> "${topic}"`);
 
     const response = await getClient().chat.completions.create({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.0-flash',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: `Ниша: ${niche}\nТема: ${topic}` }
       ],
-      temperature: 0.7,
-      max_tokens: 3000
+      temperature: 0.7
     });
 
     const content = response.choices[0].message.content;
