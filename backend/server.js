@@ -303,7 +303,7 @@ bot.on('message_created', async (ctx) => {
     if (!text && !(ctx.message?.parts)) return;
 
     // ─ Состояние: ожидаем картинку ─
-    if (userState[userId] && userState[userId].startsWith('waiting_image_')) {
+    if (typeof userState[userId] === 'string' && userState[userId].startsWith('waiting_image_')) {
       const draftId = userState[userId].replace('waiting_image_', '');
       let imgUrl = null;
 
