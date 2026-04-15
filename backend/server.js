@@ -303,8 +303,24 @@ bot.on('message_created', async (ctx) => {
     if (!text && !(ctx.message?.parts)) return;
 
     // ─ Состояние: ожидаем картинку ─
+    let imageDraftId = null;
+    let imageUserId = null;
+    
+    // Ищем, не ожидает ли кто-либо отправку картинки
     if (typeof userState[userId] === 'string' && userState[userId].startsWith('waiting_image_')) {
-      const draftId = userState[userId].replace('waiting_image_', '');
+      imageDraftId = userState[userId].replace('waiting_image_', '');
+      imageUserId = userId;
+    } else {
+      for (const uid in userState) {
+        if (typeof userState[uid] === 'string' && userState[uid].startsWith('waiting_image_')) {
+          imageDraftId = userState[uid].replace('waiting_image_', '');
+          imageUserId = uid;
+          break;
+        }
+      }
+    }
+
+    if (imageDraftId) {
       let imgUrl = null;
 
       // 1. Попытка вытащить URL из сырого текста
@@ -325,9 +341,9 @@ bot.on('message_created', async (ctx) => {
       }
 
       if (imgUrl) {
-         await db.collection('articles').updateOne({ _id: draftId }, { $set: { imageUrl: imgUrl } });
+         await db.collection('articles').updateOne({ _id: imageDraftId }, { $set: { imageUrl: imgUrl } });
          await ctx.reply('✅ Картинка успешно обновлена!');
-         delete userState[userId];
+         delete userState[imageUserId];
          await ctx.reply('Выбери действие:', MAIN_MENU);
       } else {
          await ctx.reply('❌ Не удалось распознать ссылку или картинку. Попробуйте еще раз отправить URL.');
