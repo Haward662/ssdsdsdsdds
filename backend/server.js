@@ -281,7 +281,7 @@ bot.action(/^delete_(.+)$/, async (ctx) => {
 
 bot.action(/^image_(.+)$/, async (ctx) => {
   const draftId = ctx.match[1];
-  const userId = ctx.query?.sender?.user_id || ctx.query?.sender?.userId || ctx.sender?.userId || 'unknown';
+  const userId = getActionUserId(ctx);
   userState[userId] = `waiting_image_${draftId}`;
   await ctx.reply('🖼 Отправьте ссылку на картинку (начинается с http/https).\n\n*Вы можете просто скопировать URL любой картинки в браузере и отправить сюда.*', { parse_mode: 'Markdown' });
 });
@@ -307,8 +307,21 @@ bot.on('message_created', async (ctx) => {
       const draftId = userState[userId].replace('waiting_image_', '');
       let imgUrl = null;
 
+      // 1. Попытка вытащить URL из сырого текста
       if (text && text.startsWith('http')) {
-        imgUrl = text;
+        imgUrl = text.split(/\s+/)[0]; // берем первый URL, если текста много
+      } 
+      // 2. Попытка вытащить прикрепленный файл/фото
+      if (!imgUrl && ctx.message?.parts && ctx.message.parts.length > 0) {
+        const filePart = ctx.message.parts.find(p => p.type === 'image' || p.type === 'photo' || p.type === 'file');
+        if (filePart?.payload?.url) {
+          imgUrl = filePart.payload.url;
+        } else if (filePart?.payload?.fileId) {
+          try {
+             const f = await bot.api.getFile({ fileId: filePart.payload.fileId });
+             imgUrl = f?.url || f?.fileUrl;
+          } catch(e) {}
+        }
       }
 
       if (imgUrl) {
@@ -317,7 +330,7 @@ bot.on('message_created', async (ctx) => {
          delete userState[userId];
          await ctx.reply('Выбери действие:', MAIN_MENU);
       } else {
-         await ctx.reply('❌ Не удалось распознать ссылку. Отправьте ссылку, начинающуюся с http/https.');
+         await ctx.reply('❌ Не удалось распознать ссылку или картинку. Попробуйте еще раз отправить URL.');
       }
       return;
     }
