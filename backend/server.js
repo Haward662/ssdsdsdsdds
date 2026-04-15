@@ -57,7 +57,7 @@ app.get('/api/articles', async (req, res) => {
         id: a._id,
         content: htmlContent,
         category: a.category || a.niche || 'Статьи',
-        excerpt: a.excerpt || (a.content ? a.content.replace(/[#*`>_~<]/g, '').replace(/\n+/g, ' ').substring(0, 150) + '...' : ''),
+        excerpt: a.excerpt || (a.content ? a.content.replace(/<[^>]*>?/gm, '').replace(/\n+/g, ' ').substring(0, 150) + '...' : ''),
         imageUrl: a.imageUrl || 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800&h=450',
         readTime: a.readTime || (a.content ? Math.ceil(a.content.split(' ').length / 200) : 5),
         tags: a.tags || []
@@ -489,7 +489,7 @@ async function generateAndSave(ctx, niche, topic, source = 'user_command') {
     const content = await generateArticle(niche, topic);
 
     // Чистый текст без markdown-разметки для excerpt и preview
-    const cleanText = content.replace(/[#*`>_~]/g, '').replace(/\n+/g, ' ').trim();
+    const cleanText = content.replace(/<[^>]*>?/gm, '').replace(/\n+/g, ' ').trim();
     const excerpt = cleanText.substring(0, 200);
 
     const draft = {

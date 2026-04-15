@@ -534,7 +534,14 @@ const ArticlePage = ({ article, onBack, trackEvent }: { article: Article; onBack
 
         <h1 className="text-3xl md:text-6xl font-black text-white italic uppercase leading-tight tracking-tighter mb-8">{article.title}</h1>
 
-        <img src={article.imageUrl} alt={article.title} className="w-full h-64 md:h-96 object-cover rounded-[2rem] mb-12 opacity-80" />
+        {article.imageUrl && (
+          <img 
+            src={article.imageUrl} 
+            alt={article.title} 
+            className="w-full h-64 md:h-96 object-cover rounded-[2rem] mb-12 opacity-80" 
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+          />
+        )}
 
         <div
           className="prose-article"
@@ -603,8 +610,13 @@ const BlogPage = ({ articles, onArticle, trackEvent }: { articles: Article[]; on
               }}
               className="cursor-pointer group bg-white/[0.03] border border-white/5 rounded-[2rem] overflow-hidden hover:border-indigo-500/30 transition-all"
             >
-              <div className="h-48 overflow-hidden">
-                <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
+              <div className="h-48 overflow-hidden bg-gradient-to-br from-indigo-900/40 to-black">
+                <img 
+                  src={article.imageUrl} 
+                  alt={article.title} 
+                  className="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" 
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
               </div>
               <div className="p-6 md:p-8">
                 <div className="flex items-center gap-3 mb-4">
